@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 20:52:27 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/07 21:43:54 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,7 @@ Application::run()
 Application&
 Application::operator=(const Application &rhs)
 {
+	Abortable::operator=(rhs);
 	this->_epollfd = rhs._epollfd;
 	this->_servers = rhs._servers;
 	return (*this);
