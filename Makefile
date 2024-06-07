@@ -6,7 +6,7 @@
 #    By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:43:39 by mconreau          #+#    #+#              #
-#    Updated: 2024/05/18 20:31:06 by mconreau         ###   ########.fr        #
+#    Updated: 2024/06/07 20:56:44 by mconreau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,12 +22,12 @@ PROJECT_LIBRARIES		:=
 
 # > COMPILATION <<<<<<<<<<
 
-COMPILER_PROGRAM		:=	clang++-12
+COMPILER_PROGRAM		:=	g++
 COMPILER_PROGRAM_DEBUG	:=	-fsanitize=undefined
 COMPILER_PROGRAM_FLAGS	:=	-O3 -o
 COMPILER_PROGRAM_OTHER	:=	
 COMPILER_OBJECTS		:=	clang++-12
-COMPILER_OBJECTS_FLAGS	:=	-O3 -g -Wall -Werror -Wextra -std=c++98 -pedantic
+COMPILER_OBJECTS_FLAGS	:=	-fPIE -O3 -g -Wall -Werror -Wextra -std=c++98 -pedantic
 
 # > EXTENSIONS <<<<<<<<<<<
 
@@ -48,6 +48,7 @@ PROJECT_SOURCES			:=	$(addprefix $(FOLDER_SOURCES)/, Webserv.cpp			\
 							Datetime/Datetime.cpp								\
 							Filesystem/Filesystem.cpp							\
 							Foundation/Application.cpp							\
+							Gateway/Gateway.cpp									\
 							Http/Request.cpp									\
 							Http/Response.cpp									\
 							Logger/Logger.cpp									\

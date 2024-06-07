@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 16:46:36 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/07 20:53:16 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,9 @@ Request::Request(const int &socket) :
 {
 }
 
-Request::Request(const Request &src)
+Request::Request(const Request &src) :
+	Abortable(src),
+	Mappable(src)
 {
 	*this = src;
 }
@@ -78,6 +80,7 @@ Request::recv()
 Request&
 Request::operator=(const Request &rhs)
 {
+	Abortable::operator=(rhs);
 	Mappable::operator=(rhs);
 	this->_socket = rhs._socket;
 	return (*this);

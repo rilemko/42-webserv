@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 18:53:15 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/07 20:52:27 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ Application::Application(const string &config) :
 		this->abort("Failed to create epoll instance.");
 }
 
-Application::Application(const Application &src)
+Application::Application(const Application &src) :
+	Abortable(src)
 {
 	*this = src;
 }

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 18:44:44 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/07 20:52:10 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,8 @@ Configuration::Configuration(const string &config, const int &epollfd)
 	}
 }
 
-Configuration::Configuration(const Configuration &src)
+Configuration::Configuration(const Configuration &src) :
+	Abortable(src)
 {
 	*this = src;
 }
@@ -126,6 +127,7 @@ Configuration::~Configuration()
 Configuration&
 Configuration::operator=(const Configuration &rhs)
 {
+	Abortable::operator=(rhs);
 	this->_servers = rhs._servers;
 	return (*this);
 }
