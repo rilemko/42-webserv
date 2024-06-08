@@ -1,7 +1,7 @@
 [ ] TODO : Create the vector<Server*> by parsing instead of hard-add it in the "Configuration" class
 		- (i) Each "Server" class contains a vector<Route>
 [ ] TODO : Create all Routes in each Server's vector<Route> by parsing
-[ ] TODO : Improve request format checking (in "Request" class) in the case the request is badly formatted or invalid
+[>] TODO : Improve request format checking (in "Request" class) in the case the request is badly formatted or invalid
 [ ] TODO : Handle "max_body_size" directive (413 HTTP error)
 [ ] TODO : Handle chunked request (with a map<int,string> ???)
 		- (?) Should we use HTTP code "100: Continue" until the last chunk ??
