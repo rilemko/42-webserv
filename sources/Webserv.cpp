@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 17:56:03 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/08 19:54:11 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/08 20:50:27 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,3 +19,27 @@ main(const int agc, const char **agv)
 	Logger::logs("Launching Webserv...");
 	return(!Application(agc > 1 ? agv[1] : "").run());
 }
+
+
+/*
+#include <chrono>
+
+int
+main(const int agc, const char **agv)
+{
+	using std::chrono::high_resolution_clock;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+    using std::chrono::milliseconds;
+
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
+	// PROCESS HERE TO BENCHMARK EXECUTION TIME
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+
+	return (0);
+}
+*/
