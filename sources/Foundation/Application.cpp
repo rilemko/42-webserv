@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 21:43:54 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/08 22:18:09 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,16 +76,9 @@ Application::run()
 				req.recv(); // Receive the data from the socket
 				
 
-
-
-
 				// =====================
 				// HERE: TOUT SE PASSE ICI <<<<<<<<<<<<<<<<<<<<<<<<<<<
 				// =====================
-
-
-
-
 
 
 				res.send("<h1>Hello there!</h1>"); // Send the data to the socket

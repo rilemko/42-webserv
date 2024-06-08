@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 15:27:59 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/08 22:16:56 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ using namespace std;
 class Response
 {
 	private  :
+		string						_header;
 		string						_packet;
 		int							_socket;
 
@@ -28,9 +29,7 @@ class Response
 									Response(const Response &src);
 									~Response();
 
-		void						make();
 		void						send(const string &packet);
-		
 
 		void						addCookie(const string &key, const string &value, const time_t &age = 0);
 		void						addHeader(const string &key, const string &value);

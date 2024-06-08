@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 20:53:16 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/08 22:17:05 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ Request::recv()
 	while ((b = ::recv(socket, buffer, 4096, MSG_DONTWAIT)) > 0)
 	{
 		buffer[b] = '\0';
-		cout << buffer << endl;
 		this->_packet += buffer;
 	}
 
