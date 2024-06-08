@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 16:06:15 by mconreau          #+#    #+#             */
-/*   Updated: 2024/05/13 21:07:31 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/08 19:54:20 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,23 @@ String::~String()
 {
 }
 
+int
+String::count(const string &subject, const string &find)
+{
+	const int	len = find.size();
+	int			i = 0;
+
+	for (size_t pos = 0; (pos = subject.find(find, pos)) != string::npos; ++i, pos += len);
+	return (i);
+}
+
 string
 String::replace(string subject, const string &from, const string &to)
 {
 	const int	len = from.size();
-	size_t		pos = 0;
 
-	while ((pos = subject.find(from, pos)) != string::npos)
-	{
+	for (size_t pos = 0; (pos = subject.find(from, pos)) != string::npos; pos += len)
 		subject.replace(pos, len, to);
-		pos += len;
-	}
 	return (subject);
 }
 
@@ -75,19 +81,21 @@ String::strim(const string &subject, const string &remove)
 	return (String::rtrim(String::ltrim(subject, remove), remove));
 }
 
-#include <iostream>
-
 vector<string>
 String::split(const string &subject, const string &delimiter)
 {
 	vector<string>	array;
 	size_t			end = 0, start = 0, len = delimiter.length();
+	string			sub;
 
 	while ((end = subject.find(delimiter, start)) != string::npos)
 	{
-		array.push_back(subject.substr(start, end - start));
+		if ((sub = subject.substr(start, end - start)).size())
+			array.push_back(sub);
 		start = end + len;
 	}
+	if ((sub = subject.substr(start, end - start)).size())
+			array.push_back(sub);
 	return (array);
 }
 
@@ -109,7 +117,7 @@ string
 String::lowercase(string subject)
 {
 	for (int i = 0, j = subject.size(); i < j; i++)
-		subject[i] = tolower(subject[i]);
+		subject[i] = ::tolower(subject[i]);
 	return (subject);
 }
 
@@ -117,6 +125,6 @@ string
 String::uppercase(string subject)
 {
 	for (int i = 0, j = subject.size(); i < j; i++)
-		subject[i] = toupper(subject[i]);
+		subject[i] = ::toupper(subject[i]);
 	return (subject);
 }

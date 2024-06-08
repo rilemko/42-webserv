@@ -1,4 +1,3 @@
-[ ] TODO : Check the "String::split()" method and fix it if necessary
 [ ] TODO : Create the vector<Server*> by parsing instead of hard-add it in the "Configuration" class
 		- (i) Each "Server" class contains a vector<Route>
 [ ] TODO : Create all Routes in each Server's vector<Route> by parsing
@@ -35,4 +34,6 @@
 [ ] TODO : Handle CGI if needed (if the route match and has "cgi_pass" directive in it). Use the Gateway class
 		- The CGI program should normally write the whole response, with status code and headers included...
 [ ] TODO : Handle Ctrl-C to properly close the program (set "Application::_status" to false)
+
 [X] TODO : (?) Handle multiple socket by server (the subject state "Choisir LE port et L’host de chaque "serveur"", so it's maybe not necessary)
+[X] TODO : Check the "String::split()" method and fix it if necessary
