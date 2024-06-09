@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/08 22:17:05 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/09 14:53:57 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ Request::recv()
 	}
 
 
-	const string	packet(buffer);
+	const string	packet(this->_packet);
 	size_t 			p = packet.find("\r\n\r\n");
 	const string 	h(packet.substr(0, p));
 	stringstream	stream(h.substr(0, (p = h.find("\r\n", 0) + 2) - 2));

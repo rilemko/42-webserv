@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 17:56:03 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/08 22:24:47 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/09 19:14:39 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,11 @@ main(const int agc, const char **agv)
 
 
 /*
+#include "Filesystem/Filesystem.hpp"
 #include <chrono>
 
 int
-main(const int agc, const char **agv)
+main()
 {
 	using std::chrono::high_resolution_clock;
     using std::chrono::duration_cast;
@@ -33,11 +34,23 @@ main(const int agc, const char **agv)
     using std::chrono::milliseconds;
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
-	// PROCESS HERE TO BENCHMARK EXECUTION TIME
-
+	cout << Filesystem::mimetype("test") << endl;
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 
+	begin = std::chrono::steady_clock::now();
+	cout << Filesystem::mimetype("test.json") << endl;
+    end = std::chrono::steady_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+
+	begin = std::chrono::steady_clock::now();
+	cout << Filesystem::mimetype("test.webm") << endl;
+    end = std::chrono::steady_clock::now();
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+
+	begin = std::chrono::steady_clock::now();
+	cout << Filesystem::mimetype("test.png") << endl;
+    end = std::chrono::steady_clock::now();
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
 
 	return (0);

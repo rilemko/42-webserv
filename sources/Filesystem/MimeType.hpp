@@ -1,37 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Abortable.hpp                                      :+:      :+:    :+:   */
+/*   MimeType.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/10 13:35:04 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/09 15:30:02 by mconreau         ###   ########.fr       */
+/*   Created: 2024/06/09 18:05:30 by mconreau          #+#    #+#             */
+/*   Updated: 2024/06/09 18:52:29 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Console/IO.hpp"
-#include "Logger/Logger.hpp"
-#include <iostream>
+#include <map>
 #include <string>
 
 using namespace std;
 
-class Abortable
+class MimeType
 {
-	protected:
-		bool							_status;
-
-	protected:
-										Abortable();
-										Abortable(const Abortable &src);
-		virtual							~Abortable() = 0;
-
-		Abortable&						operator=(const Abortable &rhs);
-	
 	public   :
-		bool							abort(const string &message = "");
-		bool							status() const;
+		map<string,string>			_mimetype;
+
+	public   :
+									MimeType();
+									MimeType(const MimeType &src);
+									~MimeType();
+
+		string						get(const string &extension);
+
+		MimeType&					operator=(const MimeType &rhs);
 };

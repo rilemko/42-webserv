@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/08 20:44:25 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/09 19:02:19 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,20 @@ Filesystem::exist(const std::string &path)
 {
 	struct stat	st;
 	return (!stat(path.c_str(), &st));
+}
+
+string
+Filesystem::mimetype(const string &path)
+{
+	static MimeType	Mime;
+	return (Mime.get(Filesystem::extension(path)));
+}
+
+string
+Filesystem::extension(const string &path)
+{
+	size_t	pos;
+	return ((pos = path.rfind('.')) != string::npos ? path.substr(pos) : "");
 }
 
 string
