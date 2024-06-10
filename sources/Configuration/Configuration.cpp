@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 21:14:18 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/10 19:01:02 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,93 +22,94 @@ Configuration::Configuration(const string &config, const int &epollfd)
 	// Parsing
 	// ==============================================
 
-	if (!stream.is_open())
-		this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false et print message to stderr)
-	else
-		Logger::info("Reading configuration: " + config);
-	while (this->_status && getline(stream, line, '\n') && ++y) // While "_status" == true and there is a line
+	if (epollfd != -1)
 	{
-		line = String::strim(line, " \f\r\t\v"); // Trim the line
-		if (context == 0 && line == "{") // If context = none and line == "{"
+		if (!stream.is_open())
+			this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false et print message to stderr)
+		else
+			Logger::info("Reading configuration: " + config);
+		while (this->_status && getline(stream, line, '\n') && ++y) // While "_status" == true and there is a line
 		{
-			// Open server.
-			Logger::dump("Entering server #" + String::tostr(this->_servers.size() + 1));
-			++context;
-		}
-		else if (context == 1 && String::match("location ** {", line)) // If context == server and line match the pattern "location ** {"
-		{
-			// Open route.
-			Logger::dump("Open route: " + line);
-			++context;
-		}
-		else if (context == 2 && line == "}") // If context == location and line == "}"
-		{
-			// Close route.
-			Logger::dump("Close route: " + line);
-			--context;
-		}
-		else if (context == 1 && line == "}") // If context == server and line == "}"
-		{
-			// Close server.
-			Logger::dump("Closing server #" + String::tostr(this->_servers.size() + 1));
-			--context;
-		}
-		else if (line.size()) // Otherwise, and if line is not empty
-		{
-			if (context == 1)
+			line = String::strim(line, " \f\r\t\v"); // Trim the line
+			if (context == 0 && line == "{") // If context = none and line == "{"
 			{
-				// Server directive.
-				Logger::dump("Directive S: " + line);
+				// Open server.
+				Logger::dump("Entering server #" + String::tostr(this->_servers.size() + 1));
+				++context;
 			}
-			if (context == 2)
+			else if (context == 1 && String::match("location ** {", line)) // If context == server and line match the pattern "location ** {"
 			{
-				// Location directive.
-				Logger::dump("Directive L: " + line);
+				// Open route.
+				Logger::dump("Open route: " + line);
+				++context;
+			}
+			else if (context == 2 && line == "}") // If context == location and line == "}"
+			{
+				// Close route.
+				Logger::dump("Close route: " + line);
+				--context;
+			}
+			else if (context == 1 && line == "}") // If context == server and line == "}"
+			{
+				// Close server.
+				Logger::dump("Closing server #" + String::tostr(this->_servers.size() + 1));
+				--context;
+			}
+			else if (line.size()) // Otherwise, and if line is not empty
+			{
+				if (context == 1)
+				{
+					// Server directive.
+					Logger::dump("Directive S: " + line);
+				}
+				if (context == 2)
+				{
+					// Location directive.
+					Logger::dump("Directive L: " + line);
+				}
 			}
 		}
-	}
-	stream.close();
+		stream.close();
 
+		// TEMP: Add one listener manually to 0.0.0.0:3000, must be created with parsing
+		this->_servers.push_back(new Server());
+		this->_servers.at(0)->target.first = "0.0.0.0";
+		this->_servers.at(0)->target.second = "3000";
+		// TEMP: Add a second listener manually to 0.0.0.0:3001, must be created with parsing
+		this->_servers.push_back(new Server());
+		this->_servers.at(1)->target.first = "0.0.0.0";
+		this->_servers.at(1)->target.second = "3001";
 
+		// ==============================================
+		// Add all servers to epoll
+		// ==============================================
 
-	// TEMP: Add one listener manually to 0.0.0.0:3000, must be created with parsing
-	this->_servers.push_back(new Server());
-	this->_servers.at(0)->target.first = "0.0.0.0";
-	this->_servers.at(0)->target.second = "3000";
-	// TEMP: Add a second listener manually to 0.0.0.0:3001, must be created with parsing
-	this->_servers.push_back(new Server());
-	this->_servers.at(1)->target.first = "0.0.0.0";
-	this->_servers.at(1)->target.second = "3001";
+		epoll_event	event;
+		event.events = EPOLLIN; // Setup event to trigger epoll only when data is received, not when data is sended
 
-	// ==============================================
-	// Add all servers to epoll
-	// ==============================================
-
-	epoll_event	event;
-	event.events = EPOLLIN; // Setup event to trigger epoll only when data is received, not when data is sended
-
-	for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing...
-	{
-		try
+		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing...
 		{
-			this->_servers[i]->run(); // Open the server socket
-			Logger::info("Server #" + String::tostr(i) + " running on socket: " + String::tostr(this->_servers[i]->socket));
+			try
+			{
+				this->_servers[i]->run(); // Open the server socket
+				Logger::info("Server #" + String::tostr(i) + " running on socket: " + String::tostr(this->_servers[i]->socket));
 
-			event.data.fd = this->_servers[i]->socket;
-			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, event.data.fd, &event) == -1) // Add server socket to epoll
+				event.data.fd = this->_servers[i]->socket;
+				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, event.data.fd, &event) == -1) // Add server socket to epoll
+				{
+					// Remove from vector<Server*> if fail
+					Logger::fail("Failed to add socket to epoll");
+					delete this->_servers[i];
+					this->_servers.erase(this->_servers.begin() + i--);
+				}
+			}
+			catch(const Socket::Exception &e) // Handle Socket creation exception
 			{
 				// Remove from vector<Server*> if fail
-				Logger::fail("Failed to add socket to epoll");
+				Logger::fail(e.what());
 				delete this->_servers[i];
 				this->_servers.erase(this->_servers.begin() + i--);
 			}
-		}
-		catch(const Socket::Exception &e) // Handle Socket creation exception
-		{
-			// Remove from vector<Server*> if fail
-			Logger::fail(e.what());
-			delete this->_servers[i];
-			this->_servers.erase(this->_servers.begin() + i--);
 		}
 	}
 }

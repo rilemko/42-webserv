@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/08 22:18:09 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/10 18:53:32 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,10 @@ Application::Application(const string &config) :
 {
 	if (this->_servers.size() && !config.size())
 		Logger::warn("Default configuration file used.");
-	if (this->_servers.size() && this->_epollfd == -1)
+	if (!this->_servers.size() && this->_epollfd == -1)
 		this->abort("Failed to create epoll instance.");
+	if (!this->_servers.size() && this->_epollfd != -1)
+		this->abort("No server to listen on.");
 }
 
 Application::Application(const Application &src) :
@@ -38,7 +40,7 @@ Application::~Application()
 bool
 Application::run()
 {
-	// Using "const int" instead of member variable to prevent program form evaluting the value each time and optimize execution
+	// Using "const int" instead of member variable to prevent program from evaluting the value each time and optimize execution
 	// "hfd" is the higher fd opened by the program before listening (0,1,2 for standard fd + 3rd for epoll + nth for servers initial socket)
 	const int		epollfd = this->_epollfd, hfd = this->_servers[this->_servers.size() - 1]->socket;
 	int				cli, e, fd;
