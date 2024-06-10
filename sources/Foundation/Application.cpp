@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/10 18:53:32 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/10 19:02:09 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ Application::Application(const string &config) :
 {
 	if (this->_servers.size() && !config.size())
 		Logger::warn("Default configuration file used.");
-	if (!this->_servers.size() && this->_epollfd == -1)
+	else if (!this->_servers.size() && this->_epollfd == -1)
 		this->abort("Failed to create epoll instance.");
-	if (!this->_servers.size() && this->_epollfd != -1)
+	else if (!this->_servers.size() && this->_epollfd != -1)
 		this->abort("No server to listen on.");
 }
 
