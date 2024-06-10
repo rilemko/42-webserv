@@ -6,7 +6,7 @@
 #    By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:43:39 by mconreau          #+#    #+#              #
-#    Updated: 2024/06/09 18:47:25 by mconreau         ###   ########.fr        #
+#    Updated: 2024/06/10 18:42:33 by mconreau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,12 +22,12 @@ PROJECT_LIBRARIES		:=
 
 # > COMPILATION <<<<<<<<<<
 
-COMPILER_PROGRAM		:=	g++
+COMPILER_PROGRAM		:=	c++
 COMPILER_PROGRAM_DEBUG	:=	-fsanitize=undefined
 COMPILER_PROGRAM_FLAGS	:=	-O3 -o
 COMPILER_PROGRAM_OTHER	:=	
-COMPILER_OBJECTS		:=	g++
-COMPILER_OBJECTS_FLAGS	:=	-O3 -g -Wall -Werror -Wextra #-std=c++98 -pedantic
+COMPILER_OBJECTS		:=	c++
+COMPILER_OBJECTS_FLAGS	:=	-O3 -g -Wall -Werror -Wextra -std=c++98 -pedantic
 
 # > EXTENSIONS <<<<<<<<<<<
 
@@ -287,7 +287,7 @@ lclean					:
 							done
 
 fclean					:	clean lclean
-							@rm -rf $(PROJECT_NAME) libraries/MLX42/build;
+							@rm -rf $(PROJECT_NAME);
 							@if [ $(REPORT_PRIMARY_TASK) = "yes" ]; then\
 								printf "$(MSG_BCOLOR_SUCCESS)[ $(MSG_SYMBOL_SUCCESS) ]";\
 								printf "$(MSG_NCOLOR_LOGGING)$(V_DISPLAY_NAME)";\
