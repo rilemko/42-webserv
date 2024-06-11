@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/09 14:53:57 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/11 19:28:37 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,18 +33,8 @@ Request::~Request()
 void
 Request::recv()
 {
-	const int 	socket = this->_socket;
-	char		buffer[4097];
-	int			b;
+	const string	packet(Filesystem::recv(this->_socket));
 
-	while ((b = ::recv(socket, buffer, 4096, MSG_DONTWAIT)) > 0)
-	{
-		buffer[b] = '\0';
-		this->_packet += buffer;
-	}
-
-
-	const string	packet(this->_packet);
 	size_t 			p = packet.find("\r\n\r\n");
 	const string 	h(packet.substr(0, p));
 	stringstream	stream(h.substr(0, (p = h.find("\r\n", 0) + 2) - 2));
@@ -70,7 +60,7 @@ Request::recv()
 			string 	key(lne.substr(0, f = lne.find(':')));
 			string	val(lne.substr(f + 1));
 
-			this->set(String::lowercase(String::strim(key, " \r\n")), String::strim(val, " \r\n"));
+			this->set(String::lowercase(String::strim(key, " \r\n")), String::lowercase(String::strim(val, " \r\n")));
 			p = e + 2;
 		}
 	}

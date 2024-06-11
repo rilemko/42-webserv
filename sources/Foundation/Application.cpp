@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/10 19:02:09 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/11 19:24:43 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,13 @@ Application::run()
 {
 	// Using "const int" instead of member variable to prevent program from evaluting the value each time and optimize execution
 	// "hfd" is the higher fd opened by the program before listening (0,1,2 for standard fd + 3rd for epoll + nth for servers initial socket)
-	const int		epollfd = this->_epollfd, hfd = this->_servers[this->_servers.size() - 1]->socket;
-	int				cli, e, fd;
-	epoll_event		event, events[32];
-	sockaddr_in		remote;
-	socklen_t		l;
-	map<int,time_t>	clients;
+	const int			epollfd = this->_epollfd, hfd = this->_servers[this->_servers.size() - 1]->socket;
+	int					cli, e, fd;
+	epoll_event			event, events[32];
+	sockaddr_in			remote;
+	socklen_t			l;
+	map<int,time_t>		clients;
+	map<int,Request>	chunked;
 	
 	event.events = EPOLLIN; // Setup event to trigger epoll only when data is received, not when data is sended
 
@@ -77,7 +78,6 @@ Application::run()
 
 				req.recv(); // Receive the data from the socket
 				
-
 				// =====================
 				// HERE: TOUT SE PASSE ICI <<<<<<<<<<<<<<<<<<<<<<<<<<<
 				// =====================

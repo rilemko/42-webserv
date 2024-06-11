@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/08 22:27:23 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/11 19:18:28 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,14 +43,7 @@ Response::send(const string &packet)
 
 	this->_packet = this->_header + this->_packet;
 
-	const int	len = this->_packet.size(), socket = this->_socket;
-	int 		b = 0, r = len, total = 0;
-
-	while (total < len)
-	{
-		r -= (b = ::send(socket, &this->_packet[total], r, MSG_DONTWAIT));
-		total += b;
-	}
+	Filesystem::send(this->_socket, this->_packet);
 }
 
 void

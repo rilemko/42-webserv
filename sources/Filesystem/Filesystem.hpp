@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 16:42:59 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/09 18:26:51 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/11 19:12:03 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -39,4 +40,6 @@ class Filesystem
 		static bool					isReadable(const string &path);
 		static bool					isWritable(const string &path);
 		static bool					isXcutable(const string &path);
+		static string				recv(const int &fd);
+		static void					send(const int &fd, const string &data);
 };

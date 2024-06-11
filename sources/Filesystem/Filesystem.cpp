@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/10 18:46:49 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/11 19:16:14 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,4 +96,31 @@ bool
 Filesystem::isXcutable(const std::string &path)
 {
 	return (!access(path.c_str(), X_OK));
+}
+
+string
+Filesystem::recv(const int &fd)
+{
+	string	packet;
+	char	buffer[4097];
+
+	for (int b = 0; (b = ::recv(fd, buffer, 4096, MSG_DONTWAIT)) > 0;)
+	{
+		buffer[b] = '\0';
+		packet += buffer;
+	}
+	return (packet);
+}
+
+void
+Filesystem::send(const int &fd, const string &data)
+{
+	const int	len = data.size();
+	int 		b = 0, r = len, total = 0;
+
+	while (total < len)
+	{
+		r -= (b = ::send(fd, &data[total], r, MSG_DONTWAIT));
+		total += b;
+	}
 }
