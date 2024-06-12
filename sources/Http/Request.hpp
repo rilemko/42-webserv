@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 22:28:30 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/12 20:31:49 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class Request : public Abortable
 									Request(const Request &src);
 									~Request();
 
-		void						recv();
+		size_t						recv();
 
 		string						getHeader(const string &key, const string &other);
 		size_t						getLength() const;

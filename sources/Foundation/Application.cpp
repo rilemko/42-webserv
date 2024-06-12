@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 23:58:49 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/12 23:18:16 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ Application::run()
 	while (this->_status) // While _status == true (may be set to false by Ctrl-C)
 	{
 		if ((e = ::epoll_wait(epollfd, events, 32, 2000)) == -1) // Wait until epoll trigger event or until 2000ms (for timeout check)
-			return (::perror("epoll_wait"), false);
+			return (this->abort("Failed to wait on epoll"));
 		for (int i = 0; i < e; i++) // For each triggered event from epoll (number of trigerred events is in "e")
 		{
 			if ((fd = events[i].data.fd) <= hfd) // If the "fd" triggered by epoll is one of the servers socket (<= "hfd"), it's a first connection from a new client
@@ -86,8 +86,8 @@ Application::run()
 				res.addPacket("<h1>Hello there!</h1>");
 				res.send(); // Send the data to the socket
 
-				// if (req.getHeader("connection", "keep-alive") != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
-				if (req.getHeader("connection", "") == "keep-alive") // <= Used for testing purpose only, use the above one in production
+				// if (String::lowercase(req.getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
+				if (String::lowercase(req.getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
 					clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
 				else
 					::close(fd); // Or close the fd

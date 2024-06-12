@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 17:56:03 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/09 19:14:39 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:10:59 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ main(const int agc, const char **agv)
 /*
 #include "Filesystem/Filesystem.hpp"
 #include <chrono>
+#include <iostream>
 
 int
 main()
@@ -34,24 +35,11 @@ main()
     using std::chrono::milliseconds;
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-	cout << Filesystem::mimetype("test") << endl;
+	vector<string>	v = Filesystem::scandir("..");
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-
-	begin = std::chrono::steady_clock::now();
-	cout << Filesystem::mimetype("test.json") << endl;
-    end = std::chrono::steady_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-
-	begin = std::chrono::steady_clock::now();
-	cout << Filesystem::mimetype("test.webm") << endl;
-    end = std::chrono::steady_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-
-	begin = std::chrono::steady_clock::now();
-	cout << Filesystem::mimetype("test.png") << endl;
-    end = std::chrono::steady_clock::now();
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+	for (size_t i = 0; i < v.size(); i++)
+		std::cout << v[i] << endl;
 
 	return (0);
 }

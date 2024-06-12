@@ -6,19 +6,22 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 16:42:59 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 19:12:03 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:05:38 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "Filesystem/MimeType.hpp"
+#include <dirent.h>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
+#include <vector>
 
 using namespace std;
 
@@ -42,4 +45,5 @@ class Filesystem
 		static bool					isXcutable(const string &path);
 		static string				recv(const int &fd);
 		static void					send(const int &fd, const string &data);
+		static vector<string>		scandir(const string &path, const bool &hidden = false);
 };

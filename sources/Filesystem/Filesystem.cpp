@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 23:37:47 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/12 22:08:57 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,4 +123,23 @@ Filesystem::send(const int &fd, const string &data)
 		r -= (b = ::send(fd, &data[total], r, MSG_DONTWAIT));
 		total += b;
 	}
+}
+
+vector<string>
+Filesystem::scandir(const string &path, const bool &hidden)
+{
+	vector<string>	scan;
+	DIR				*dir;
+
+	if ((dir = opendir(path.c_str())) != NULL)
+	{
+		for (struct dirent *dp; (dp = readdir(dir));)
+		{
+			string	target(dp->d_name);
+
+			if (target != "." && target != ".." && (hidden || target[0] != '.'))
+				scan.push_back(target);
+		}
+	}
+	return (scan);
 }

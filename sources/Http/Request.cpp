@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 23:44:59 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/12 20:31:03 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ Request::~Request()
 {
 }
 
-void
+size_t
 Request::recv()
 {
 	const string	packet(Filesystem::recv(this->_socket));
@@ -59,10 +59,11 @@ Request::recv()
 			string 	key(lne.substr(0, f = lne.find(':')));
 			string	val(lne.substr(f + 1));
 
-			this->_header[String::lowercase(String::strim(key, " \r\n"))] = String::lowercase(String::strim(val, " \r\n"));
+			this->_header[String::lowercase(String::strim(key, " "))] = String::strim(val, " \r\n");
 			p = e + 2;
 		}
 	}
+	return (this->_length);
 }
 
 string
