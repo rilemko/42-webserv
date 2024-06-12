@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 19:24:43 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/11 23:58:49 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,11 +82,12 @@ Application::run()
 				// HERE: TOUT SE PASSE ICI <<<<<<<<<<<<<<<<<<<<<<<<<<<
 				// =====================
 
+				res.setStatus(200);
+				res.addPacket("<h1>Hello there!</h1>");
+				res.send(); // Send the data to the socket
 
-				res.send("<h1>Hello there!</h1>"); // Send the data to the socket
-
-				// if (req.get("connection", "keep-alive") != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
-				if (req.get("connection", "") == "keep-alive") // <= Used for testing purpose only, use the above one in production
+				// if (req.getHeader("connection", "keep-alive") != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
+				if (req.getHeader("connection", "") == "keep-alive") // <= Used for testing purpose only, use the above one in production
 					clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
 				else
 					::close(fd); // Or close the fd

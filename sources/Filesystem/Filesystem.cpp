@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 19:16:14 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/11 23:37:47 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,9 @@ string
 Filesystem::recv(const int &fd)
 {
 	string	packet;
-	char	buffer[4097];
+	char	buffer[512];
 
-	for (int b = 0; (b = ::recv(fd, buffer, 4096, MSG_DONTWAIT)) > 0;)
+	for (int b = 0; (b = ::recv(fd, buffer, 511, MSG_DONTWAIT)) > 0;)
 	{
 		buffer[b] = '\0';
 		packet += buffer;

@@ -12,9 +12,7 @@
 		- The last request chunk is formatted like this:
 		0\r\n
 		\r\n
-[ ] TODO : Handle request with a body (POST request for example...)
 [ ] TODO : Handle file uploading ("upload" directive for upload location)
-[ ] TODO : Add the method "addBody()" to the "Response" class instead of passing data by "send()" parameter
 [ ] TODO : Matching server with "server_name" directive. "Server::match()" should take the "Request" as parameter
 		- See:  https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms
 [ ] TODO : Matching route (location, "limit_to" directive (GET, POST...) and so..). "Route::match()" should be called inside "Server::match()".
@@ -37,3 +35,5 @@
 [X] TODO : (?) Handle multiple socket by server (the subject state "Choisir LE port et L’host de chaque "serveur"", so it's maybe not necessary)
 [X] TODO : Check the "String::split()" method and fix it if necessary
 [X] TODO : Add a "get()" and "set()" method to the Filesystem static class, to handle reading (html file) and writing (uploaded file)
+[X] TODO : Add the method "addBPacket()" to the "Response" class instead of passing data by "send()" parameter
+[X] TODO : Handle request with a body (POST request for example...)

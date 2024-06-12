@@ -6,7 +6,7 @@
 #    By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:43:39 by mconreau          #+#    #+#              #
-#    Updated: 2024/06/10 18:42:33 by mconreau         ###   ########.fr        #
+#    Updated: 2024/06/11 23:18:05 by mconreau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,6 +50,7 @@ PROJECT_SOURCES			:=	$(addprefix $(FOLDER_SOURCES)/, Webserv.cpp			\
 							Filesystem/MimeType.cpp								\
 							Foundation/Application.cpp							\
 							Gateway/Gateway.cpp									\
+							Http/HttpStatus.cpp									\
 							Http/Request.cpp									\
 							Http/Response.cpp									\
 							Logger/Logger.cpp									\
