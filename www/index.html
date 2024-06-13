@@ -27,5 +27,11 @@
 
 			<input type="submit" value="Envoyer">
 		</form>
-    </body>
+		<hr>
+		<form action="/upload" method="post" enctype="multipart/form-data"> <!-- formulaire pour uploader un fichier -->
+			<label for="file">Uploader un fichier :</label>
+			<input type="file" id="file" name="file" required><br><br>
+			<input type="submit" value="Uploader">
+		</form>
+	</body>
 </html>
