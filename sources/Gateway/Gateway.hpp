@@ -6,25 +6,28 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:09 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/13 14:48:21 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 22:36:48 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Http/Request.hpp"
 #include <string>
-
-using namespace std;
 
 class Gateway
 {
 	public   :
-		string						a;
+		Gateway();
+		Gateway(const Gateway &src);
+		~Gateway();
+		Gateway&	operator=(const Gateway &rhs);
 
+		void addenv(std::string key, std::string value);
+		char	**put_to_env();
+		void	cgirun(Request	req);
 	public   :
-									Gateway();
-									Gateway(const Gateway &src);
-									~Gateway();
-
-		Gateway&					operator=(const Gateway &rhs);
+		std::vector<char *> v;
+		std::string	a;
 };
+

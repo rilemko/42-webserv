@@ -6,11 +6,12 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 22:30:29 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 22:39:35 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Foundation/Application.hpp"
+#include "Gateway/Gateway.hpp"
 
 Application::Application(const string &config) :
 	_epollfd(epoll_create(1)),
@@ -49,6 +50,7 @@ Application::run()
 	socklen_t			l;
 	map<int,time_t>		clients;
 	map<int,Request>	chunked;
+	Gateway				cgi;
 	
 	event.events = EPOLLIN; // Setup event to trigger epoll only when data is received, not when data is sended
 
@@ -77,14 +79,14 @@ Application::run()
 				Response	res(fd);
 
 				req.recv(); // Receive the data from the socket
-				
+				cgi.cgirun(req);
 				// =====================
 				// HERE: TOUT SE PASSE ICI <<<<<<<<<<<<<<<<<<<<<<<<<<<
 				// =====================
 
 				res.setStatus(200);
 				//res.addPacket("<h1>Hello there!</h1>");
-				res.addPacket(Template::index("."));
+				//res.addPacket(Template::index("."));
 				//res.addPacket(Template::error(431));
 				res.send(); // Send the data to the socket
 

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/12 20:31:49 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 22:39:09 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ class Request : public Abortable
 		string						_params;
 		int							_socket;
 		string						_target;
-
 		string						_version;
 
 	public   :

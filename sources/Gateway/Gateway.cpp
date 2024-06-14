@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 18:29:22 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 18:45:29 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <string.h>
 #include "Gateway/Gateway.hpp"
+#include "Http/Request.hpp"
 
 Gateway::Gateway()
 {
@@ -25,9 +27,40 @@ Gateway::~Gateway()
 {
 }
 
-Gateway&
-Gateway::operator=(const Gateway &rhs)
+Gateway& Gateway::operator=(const Gateway &rhs)
 {
 	(void) rhs;
 	return (*this);
 }
+
+void	Gateway::addenv(std::string key, std::string value)
+{
+	//lenght
+
+	std::string str = key + value;
+	v.push_back(strdup(str.c_str()));
+}
+
+char **Gateway::put_to_env()
+{
+		char **envp = new char*[v.size() + 1];
+		size_t i;
+
+		for (i = 0; i < v.size(); ++i)
+			envp[i] = v[i];
+		envp[i] = 0;
+		return (envp);
+}
+
+void	Gateway::cgirun(Request	req)
+{
+	char **envp;
+	addenv("REQUEST_METHOD=",req.getMethod());
+	addenv("SERVER_PROTOCOL=",req.getPacket());
+	addenv("Co=",req.getMethod());
+	// addenv("REQUEST_METHOD=",req.getMethod());
+	// addenv("CONTENT_LENGTH=",req.getLength(), req);
+	envp = put_to_env();
+	std::cout << envp[0] << std::endl;
+}
+
