@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 22:38:38 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 22:40:28 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,16 +99,6 @@ Request::getTarget() const
 {
 	return (this->_target);
 }
-
-
-string
-Request::getQuery(const std::string &url)
-{
-    std::vector<std::string> tmp = String::split(url, "?");
-    return (tmp.size() == 1) ? std::string() : tmp.back();
-}
-
-
 
 Request&
 Request::operator=(const Request &rhs)
