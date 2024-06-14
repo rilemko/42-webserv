@@ -3,27 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:09 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 20:56:18 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 15:28:29 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Http/Request.hpp"
 #include <string>
-
-using namespace std;
 
 class Gateway
 {
 	public   :
-		string						a;
+		Gateway();
+		Gateway(const Gateway &src);
+		~Gateway();
+		Gateway&	operator=(const Gateway &rhs);
+		char	**addenv();
+		void	cgirun();
 	public   :
-									Gateway();
-									Gateway(const Gateway &src);
-									~Gateway();
-
-		Gateway&					operator=(const Gateway &rhs);
+		std::vector<char *> v;
+		std::string	a;
 };
+
