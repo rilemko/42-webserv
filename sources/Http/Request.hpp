@@ -6,7 +6,7 @@
 /*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 17:41:36 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/14 18:56:02 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@ class Request : public Abortable
 		string						_params;
 		int							_socket;
 		string						_target;
+		string						_version;
+		string						_query;
+		
 
 
 	public   :
@@ -39,7 +42,8 @@ class Request : public Abortable
 
 		size_t						recv();
 
-		string						_version;
+
+		string						getQuery(const std::string &url);
 		string						getHeader(const string &key, const string &other);
 		size_t						getLength() const;
 		string						getMethod() const;

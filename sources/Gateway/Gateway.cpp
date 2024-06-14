@@ -6,7 +6,7 @@
 /*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 17:42:17 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/14 18:45:29 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,8 @@ void	Gateway::cgirun(Request	req)
 {
 	char **envp;
 	addenv("REQUEST_METHOD=",req.getMethod());
-	addenv("SERVER_PROTOCOL=",req._version);
-	// addenv("REQUEST_METHOD=",req.getMethod());
+	addenv("SERVER_PROTOCOL=",req.getPacket());
+	addenv("Co=",req.getMethod());
 	// addenv("REQUEST_METHOD=",req.getMethod());
 	// addenv("CONTENT_LENGTH=",req.getLength(), req);
 	envp = put_to_env();
