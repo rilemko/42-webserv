@@ -6,7 +6,7 @@
 /*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 15:26:32 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/14 16:33:50 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ Application::run()
 				Response	res(fd);
 
 				req.recv(); // Receive the data from the socket
-				cgi.addenv();
+				cgi.cgirun(req);
 				// =====================
 				// HERE: TOUT SE PASSE ICI <<<<<<<<<<<<<<<<<<<<<<<<<<<
 				// =====================

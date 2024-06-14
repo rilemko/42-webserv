@@ -6,10 +6,11 @@
 /*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 15:28:14 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/14 17:42:17 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <string.h>
 #include "Gateway/Gateway.hpp"
 #include "Http/Request.hpp"
 
@@ -32,7 +33,15 @@ Gateway& Gateway::operator=(const Gateway &rhs)
 	return (*this);
 }
 
-char **Gateway::addenv()
+void	Gateway::addenv(std::string key, std::string value)
+{
+	//lenght
+
+	std::string str = key + value;
+	v.push_back(strdup(str.c_str()));
+}
+
+char **Gateway::put_to_env()
 {
 		char **envp = new char*[v.size() + 1];
 		size_t i;
@@ -43,8 +52,15 @@ char **Gateway::addenv()
 		return (envp);
 }
 
-void	Gateway::cgirun()
+void	Gateway::cgirun(Request	req)
 {
-	
+	char **envp;
+	addenv("REQUEST_METHOD=",req.getMethod());
+	addenv("SERVER_PROTOCOL=",req._version);
+	// addenv("REQUEST_METHOD=",req.getMethod());
+	// addenv("REQUEST_METHOD=",req.getMethod());
+	// addenv("CONTENT_LENGTH=",req.getLength(), req);
+	envp = put_to_env();
+	std::cout << envp[0] << std::endl;
 }
 

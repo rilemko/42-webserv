@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/12 20:31:49 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 17:41:36 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ class Request : public Abortable
 		int							_socket;
 		string						_target;
 
-		string						_version;
 
 	public   :
 									Request(const int &socket);
@@ -40,6 +39,7 @@ class Request : public Abortable
 
 		size_t						recv();
 
+		string						_version;
 		string						getHeader(const string &key, const string &other);
 		size_t						getLength() const;
 		string						getMethod() const;
