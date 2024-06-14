@@ -20,7 +20,7 @@
 		- See: https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms
 [ ] TODO : Handle redirection ("rewrite" directive, which contains the HTTP code and the new URL)
 [ ] TODO : Check file existence for the file targeted by the route
-        - (i) "Filesystem::isReg()" method do that
+		- (i) "Filesystem::isReg()" method do that
 		- If exists, read it and add it to "Response" body with the "addBody()" method, otherwise HTTP error
 [ ] TODO : Handle HTTP errors
 		- No route match (404), file is missing (404 ?), bad request (400), server problem (reading file problem ?) (500),

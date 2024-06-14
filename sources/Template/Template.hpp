@@ -1,30 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Gateway.hpp                                        :+:      :+:    :+:   */
+/*   Template.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/07 18:27:09 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/13 14:48:21 by mconreau         ###   ########.fr       */
+/*   Created: 2024/06/14 19:48:31 by mconreau          #+#    #+#             */
+/*   Updated: 2024/06/14 22:30:15 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Filesystem/Filesystem.hpp"
+#include "Http/HttpStatus.hpp"
+#include "Support/Helpers/String.hpp"
 #include <string>
+#include <vector>
 
 using namespace std;
 
-class Gateway
+class Template
 {
+	private  :
+		virtual						~Template() = 0;
+	
 	public   :
-		string						a;
-
-	public   :
-									Gateway();
-									Gateway(const Gateway &src);
-									~Gateway();
-
-		Gateway&					operator=(const Gateway &rhs);
+		static string				error(const int &status);
+		static string				index(const string &target);
 };

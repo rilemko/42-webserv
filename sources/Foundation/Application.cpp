@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/12 23:18:16 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 22:30:29 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ Application::run()
 	// ==========================
 	// Main loop
 	// ==========================
-
+	
 	while (this->_status) // While _status == true (may be set to false by Ctrl-C)
 	{
 		if ((e = ::epoll_wait(epollfd, events, 32, 2000)) == -1) // Wait until epoll trigger event or until 2000ms (for timeout check)
@@ -83,7 +83,9 @@ Application::run()
 				// =====================
 
 				res.setStatus(200);
-				res.addPacket("<h1>Hello there!</h1>");
+				//res.addPacket("<h1>Hello there!</h1>");
+				res.addPacket(Template::index("."));
+				//res.addPacket(Template::error(431));
 				res.send(); // Send the data to the socket
 
 				// if (String::lowercase(req.getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only

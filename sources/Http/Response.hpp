@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/12 22:32:49 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 19:55:20 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,6 @@ using namespace std;
 
 class Response
 {
-	public   :
-		static const char*			TEMPLATE_ERROR;
-
 	private  :
 		string						_header;
 		string						_packet;

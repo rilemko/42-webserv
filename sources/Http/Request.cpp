@@ -6,13 +6,11 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/12 20:31:03 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 19:42:45 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Http/Request.hpp"
-
-#include <iostream>
 
 Request::Request(const int &socket) :
 	_socket(socket)

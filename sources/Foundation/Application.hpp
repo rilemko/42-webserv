@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:25 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/07 15:45:47 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/14 20:04:40 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include "Server/Server.hpp"
 #include "Support/Extends/Abortable.hpp"
 #include "Support/Helpers/Vector.hpp"
+#include "Template/Template.hpp"
 #include <string>
 #include <sys/epoll.h>
 #include <vector>
