@@ -1,36 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Route.hpp                                          :+:      :+:    :+:   */
+/*   Map.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 21:31:14 by mconreau         ###   ########.fr       */
+/*   Created: 2023/11/22 20:29:37 by mconreau          #+#    #+#             */
+/*   Updated: 2024/06/16 17:52:39 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Http/Request.hpp"
-#include <string>
-#include <vector>
+#include "Support/Extends/Mappable.hpp"
+#include <map>
 
-using namespace std;
-
-class Route
+template<typename KEY, typename VAL>
+class Map : public Mappable<KEY,VAL>
 {
+	private  :
+		virtual						~Map() = 0;
+	
 	public   :
-		vector<string>				_method;
-		string						_target;
-		string						_upload;
-
-	public   :
-									Route();
-									Route(const Route &src);
-									~Route();
-
-		bool						match(Request &request) const;
-
-		Route&						operator=(const Route &rhs);
+		template<typename R>
+		static void					iterKey(map<KEY,VAL> &m, R (*callback)(KEY));
+		template<typename R>
+		static void					iterVal(map<KEY,VAL> &m, R (*callback)(VAL));
 };
+
+#include "Support/Helpers/Map.tpp"

@@ -6,7 +6,7 @@
 #    By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:43:39 by mconreau          #+#    #+#              #
-#    Updated: 2024/06/14 19:51:44 by mconreau         ###   ########.fr        #
+#    Updated: 2024/06/16 17:02:20 by mconreau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -58,6 +58,7 @@ PROJECT_SOURCES			:=	$(addprefix $(FOLDER_SOURCES)/, Webserv.cpp			\
 							Server/Server.cpp									\
 							Server/Route.cpp									\
 							Support/Extends/Abortable.cpp						\
+							Support/Helpers/Map.cpp								\
 							Support/Helpers/String.cpp							\
 							Support/Helpers/Vector.cpp							\
 							Template/Template.cpp								\

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/05/12 15:55:35 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/16 13:15:46 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ using namespace std;
 
 class Socket
 {
-	protected:
+	private  :
 		int							_afinet;
+		pair<string,string>			_listen;
 		int							_socket;
-		pair<string,string>			_target;
 
 	public   :
 									Socket(const pair<string,string> &target, const int &type = SOCK_STREAM | SOCK_NONBLOCK);

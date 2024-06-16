@@ -1,20 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Map.hpp                                            :+:      :+:    :+:   */
+/*   Map.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/22 20:29:37 by mconreau          #+#    #+#             */
-/*   Updated: 2024/05/08 16:23:45 by mconreau         ###   ########.fr       */
+/*   Created: 2023/11/27 16:06:15 by mconreau          #+#    #+#             */
+/*   Updated: 2024/06/16 20:04:07 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
-
-#include "Support/Extends/Mappable.hpp"
+#include "Support/Helpers/Map.hpp"
 
 template<typename KEY, typename VAL>
-class Map : public Mappable<KEY,VAL>
+Map<KEY,VAL>::~Map()
 {
-};
+}

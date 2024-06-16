@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 19:55:20 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/16 21:36:57 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,13 @@ class Response
 									Response(const Response &src);
 									~Response();
 
-		size_t						send();
+		void						send();
+		void						send(const string &packet);
 
-		void						addCookie(const string &key, const string &value, const time_t &age = 0);
-		void						addHeader(const string &key, const string &value);
-		void						addPacket(const string &packet);
-		void						setStatus(const size_t &status);
+		Response&					addCookie(const string &key, const string &value, const time_t &age = 0);
+		Response&					addHeader(const string &key, const string &value);
+		Response&					addPacket(const string &packet);
+		Response&					setStatus(const size_t &status);
 
 		Response&					operator=(const Response &rhs);
 };

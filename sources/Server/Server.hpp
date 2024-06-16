@@ -6,14 +6,17 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/05/12 16:22:16 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/16 21:25:23 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Http/Request.hpp"
 #include "Logger/Logger.hpp"
 #include "Network/Socket.hpp"
+#include "Support/Helpers/String.hpp"
+#include "Support/Helpers/Vector.hpp"
 #include "Server/Route.hpp"
 #include <map>
 #include <string>
@@ -23,13 +26,12 @@ using namespace std;
 class Server
 {
 	public   :
-		int							bdsize;
 		map<int,string>				errors;
-		vector<string>				indexs;
-		vector<Route>				routes;
+		pair<string,string>			listen;
+		size_t						maxbdy;
+		vector<Route*>				routes;
 		vector<string>				snames;
 		int							socket;
-		pair<string,string>			target;
 
 	public   :
 									Server();
@@ -37,7 +39,7 @@ class Server
 									~Server();
 
 		void						run();
-		bool						match() const;
+		bool						match(Request &request) const;
 
 		Server&						operator=(const Server &rhs);
 };

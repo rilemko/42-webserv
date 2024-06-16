@@ -6,14 +6,15 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 22:40:28 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/16 21:47:29 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Http/Request.hpp"
 
 Request::Request(const int &socket) :
-	_socket(socket)
+	_socket(socket),
+	_status(200)
 {
 }
 
@@ -27,7 +28,7 @@ Request::~Request()
 {
 }
 
-size_t
+void
 Request::recv()
 {
 	const string	packet(Filesystem::recv(this->_socket));
@@ -61,7 +62,6 @@ Request::recv()
 			p = e + 2;
 		}
 	}
-	return (this->_length);
 }
 
 string
@@ -92,6 +92,12 @@ string
 Request::getParams() const
 {
 	return (this->_params);
+}
+
+size_t
+Request::getStatus() const
+{
+	return (this->_status);
 }
 
 string

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/11 19:20:07 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/16 22:01:42 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,11 @@ Configuration::Configuration(const string &config, const int &epollfd)
 	size_t		context = 0, y = 0; // "context": 0 = none, 1 = server, 2 = route; "y": number of the line, can be used for error message if needed
 	string		line;
 
-	// ==============================================
-	// Parsing
-	// ==============================================
-
-	if (epollfd != -1)
+	if (!stream.is_open())
+		this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false et print message to stderr)
+	else
 	{
-		if (!stream.is_open())
-			this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false et print message to stderr)
-		else
-			Logger::info("Reading configuration: " + config);
+		Logger::info("Reading configuration: " + config);
 		while (this->_status && getline(stream, line, '\n') && ++y) // While "_status" == true and there is a line
 		{
 			line = String::strim(line, " \f\r\t\v"); // Trim the line
@@ -73,12 +68,20 @@ Configuration::Configuration(const string &config, const int &epollfd)
 
 		// TEMP: Add one listener manually to 0.0.0.0:3000, must be created with parsing
 		this->_servers.push_back(new Server());
-		this->_servers.at(0)->target.first = "0.0.0.0";
-		this->_servers.at(0)->target.second = "3000";
+		this->_servers[0]->listen.first = "0.0.0.0";
+		this->_servers[0]->listen.second = "3000";
+		this->_servers[0]->snames.push_back("*");
+		this->_servers[0]->routes.push_back(new Route());
+		this->_servers[0]->routes[0]->_target = "/get";
+		this->_servers[0]->routes[0]->_method.push_back("GET");
+		this->_servers[0]->routes.push_back(new Route());
+		this->_servers[0]->routes[1]->_target = "/post";
+		this->_servers[0]->routes[1]->_method.push_back("POST");
+
 		// TEMP: Add a second listener manually to 0.0.0.0:3001, must be created with parsing
 		this->_servers.push_back(new Server());
-		this->_servers.at(1)->target.first = "0.0.0.0";
-		this->_servers.at(1)->target.second = "3001";
+		this->_servers[1]->listen.first = "0.0.0.0";
+		this->_servers[1]->listen.second = "3001";
 
 		// ==============================================
 		// Add all servers to epoll

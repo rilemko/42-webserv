@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/05/09 19:54:21 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/16 21:23:26 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,11 @@ Route::~Route()
 }
 
 bool
-Route::match() const
+Route::match(Request &request) const
 {
-	return (true);
+	if (this->_target == request.getTarget())
+		return (true);
+	return (false);
 }
 
 Route&

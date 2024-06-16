@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 18:45:29 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/16 14:19:32 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,9 @@ void	Gateway::addenv(std::string key, std::string value)
 
 	std::string str = key + value;
 	v.push_back(strdup(str.c_str()));
+
+	// For adding char* to vector. But it's better to add const char* to a vector<const char*> anyway for performance
+	// v.push_back(&str[0]);
 }
 
 char **Gateway::put_to_env()
@@ -55,12 +58,14 @@ char **Gateway::put_to_env()
 void	Gateway::cgirun(Request	req)
 {
 	char **envp;
+
+	(void) envp;
 	addenv("REQUEST_METHOD=",req.getMethod());
 	addenv("SERVER_PROTOCOL=",req.getPacket());
 	addenv("Co=",req.getMethod());
 	// addenv("REQUEST_METHOD=",req.getMethod());
 	// addenv("CONTENT_LENGTH=",req.getLength(), req);
 	envp = put_to_env();
-	std::cout << envp[0] << std::endl;
+	//std::cout << envp[0] << std::endl;
 }
 
