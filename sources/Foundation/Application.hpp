@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:25 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 18:24:18 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 13:15:34 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ class Application : public Abortable
 	
 	private  :
 		void						add(const int &fd);
+		void						handle(const int &fd);
 		void						timeout();
 
 	public   :

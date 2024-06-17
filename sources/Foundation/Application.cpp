@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 22:33:44 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 13:22:18 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,31 +56,11 @@ Application::run()
 			if ((fd = events[i].data.fd) <= hfd) // If the "fd" triggered by epoll is one of the servers socket (<= "hfd"), it's a first connection from a new client
 				this->add(fd);
 			else // Handle the data receveid on the socket "fd"
-			{
-				Request		req(fd);
-				Response	res(fd);
-				//Gateway		cgi;
-
-				req.recv();
-
-				//cgi.cgirun(req);
-
-				res.setStatus(200);
-				res.addPacket("<h1>Hello there!</h1>");
-				//res.addPacket(Template::index("."));
-				//res.addPacket(Template::error(431));
-				res.send(); // Send the data to the socket
-
-				// if (String::lowercase(req.getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
-				if (String::lowercase(req.getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
-					this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
-				else
-					::close(fd); // Or close the fd
-			}
+				this->handle(fd);
 		}
 		this->timeout();
 	}
-	return (true);
+	return (this->_status);
 }
 
 void
@@ -96,6 +76,30 @@ Application::add(const int &fd)
 }
 
 void
+Application::handle(const int &fd)
+{
+	Request		req(fd);
+	Response	res(fd);
+	//Gateway		cgi;
+
+	req.recv();
+
+	//cgi.cgirun(req);
+
+	res.setStatus(200);
+	res.addPacket("<h1>Hello there!</h1>");
+	//res.addPacket(Template::index("."));
+	//res.addPacket(Template::error(431));
+	res.send(); // Send the data to the socket
+
+	// if (String::lowercase(req.getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
+	if (String::lowercase(req.getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
+		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
+	else
+		::close(fd); // Or close the fd
+}
+
+void
 Application::timeout()
 {
 	const time_t	now = ::time(0);
@@ -105,6 +109,8 @@ Application::timeout()
 		if (now - (it->second) > 2)
 		{
 			::close(it->first);
+			if (this->_chunked.find(it->first) != this->_chunked.end())
+				this->_chunked.erase(it->first);
 			this->_clients.erase(it++);
 		}
 		else
