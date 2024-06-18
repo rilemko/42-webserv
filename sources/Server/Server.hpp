@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 21:25:23 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 22:12:45 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Server
 		vector<Route*>				routes;
 		vector<string>				snames;
 		int							socket;
+		pair<in_addr_t,in_port_t>	target;
 
 	public   :
 									Server();
@@ -39,6 +40,8 @@ class Server
 									~Server();
 
 		void						run();
+
+		size_t						check(Request &request) const;
 		bool						match(Request &request) const;
 
 		Server&						operator=(const Server &rhs);

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 13:22:18 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 22:11:03 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,18 +66,79 @@ Application::run()
 void
 Application::add(const int &fd)
 {
-	static epoll_event 	event = {EPOLLIN, {0}};
-	static sockaddr_in	remote;
-	static socklen_t	len;
+	static epoll_event 	e = {EPOLLIN, {0}};
+	static sockaddr_in	r;
+	socklen_t			l = sizeof(sockaddr_in);
 
-	if ((event.data.fd = ::accept(fd, (sockaddr*) &remote, &len)) > -1)
-		if (::epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, event.data.fd, &event) == -1)
-			::close(event.data.fd);
+	if ((e.data.fd = ::accept(fd, (sockaddr*) &r, &l)) > -1)
+		if (::epoll_ctl(this->_epollfd, EPOLL_CTL_ADD, e.data.fd, &e) == -1)
+			::close(e.data.fd);
 }
 
 void
 Application::handle(const int &fd)
 {
+	Request		req(fd);
+	Response	res(fd);
+	Server		*server;
+	Route		*route;
+	size_t		status;
+
+	req.recv();
+
+	if (req.getStatus() != 200)
+	{
+		res.setStatus(status).addPacket(Template::error(req.getStatus())).send();
+		goto next;
+	}
+
+	for (size_t i = 0; i < this->_servers.size(); i++)
+	{
+		if ((server = this->_servers[i])->match(req))
+		{
+			if ((status = server->check(req)) != 200)
+			{
+				res.setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
+				goto next;
+			}
+			else
+			{
+				for (size_t j = 0; j < server->routes.size(); j++)
+				{
+					if ((route = server->routes[j])->match(req))
+					{
+						if ((status = route->check(req)) != 200)
+						{
+							res.setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
+							goto next;
+						}
+						else
+						{
+							/* =======================
+							/ ICI, SERVER ET ROUTE TROUVÉ, LA REQUETE EST CONSTRUITE ET ENVOYÉ
+							/ ======================= */
+
+							res.setStatus(200).addPacket("<h1>Hello there!</h1>").send();
+							goto next;
+						}
+					}
+				}
+				res.setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+				goto next;
+			}
+		}
+	}
+	res.setStatus(404).addPacket(Template::error(404)).send();
+	next: ;
+
+	// if (String::lowercase(req.getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
+	if (String::lowercase(req.getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
+		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
+	else
+		::close(fd); // Or close the fd
+
+
+	/*
 	Request		req(fd);
 	Response	res(fd);
 	//Gateway		cgi;
@@ -97,6 +158,7 @@ Application::handle(const int &fd)
 		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
 	else
 		::close(fd); // Or close the fd
+	*/
 }
 
 void
@@ -109,8 +171,7 @@ Application::timeout()
 		if (now - (it->second) > 2)
 		{
 			::close(it->first);
-			if (this->_chunked.find(it->first) != this->_chunked.end())
-				this->_chunked.erase(it->first);
+			this->_chunked.erase(it->first);
 			this->_clients.erase(it++);
 		}
 		else

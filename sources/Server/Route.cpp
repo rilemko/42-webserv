@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 21:23:26 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 14:53:09 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,18 @@ Route::~Route()
 {
 }
 
+size_t
+Route::check(Request &request) const
+{
+	if (!Vector::find<string>(this->_method, request.getMethod()))
+		return (405);
+	return (200);
+}
+
 bool
 Route::match(Request &request) const
 {
-	if (this->_target == request.getTarget())
-		return (true);
-	return (false);
+	return (this->_target == request.getTarget());
 }
 
 Route&

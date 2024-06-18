@@ -6,14 +6,24 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/26 22:32:44 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 17:23:23 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 15:14:11 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 template<typename TYPE>
-void
-Vector::free(vector<TYPE> &v)
+bool
+Vector::find(const vector<TYPE> &v, const TYPE &find)
 {
-	for (size_t i = 0; i < v.size(); i++)
-		delete v[i];
+	for (typename vector<TYPE>::const_iterator it = v.begin(); it != v.end(); it++)
+		if (*it == find)
+			return (true);
+	return (false);
+}
+
+template<typename TYPE>
+void
+Vector::free(const vector<TYPE> &v)
+{
+	for (typename vector<TYPE>::const_iterator it = v.begin(); it != v.end(); it++)
+		delete *it;
 }

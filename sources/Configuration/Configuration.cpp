@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 22:01:42 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 22:17:21 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,11 @@ Configuration::Configuration(const string &config, const int &epollfd)
 		this->_servers[0]->routes.push_back(new Route());
 		this->_servers[0]->routes[1]->_target = "/post";
 		this->_servers[0]->routes[1]->_method.push_back("POST");
+		this->_servers[0]->errors[404] = "404.html";
 
 		// TEMP: Add a second listener manually to 0.0.0.0:3001, must be created with parsing
 		this->_servers.push_back(new Server());
-		this->_servers[1]->listen.first = "0.0.0.0";
+		this->_servers[1]->listen.first = "192.168.1.108";
 		this->_servers[1]->listen.second = "3001";
 
 		// ==============================================
@@ -95,6 +96,21 @@ Configuration::Configuration(const string &config, const int &epollfd)
 			try
 			{
 				this->_servers[i]->run(); // Open the server socket
+
+				sockaddr_in	addr;
+				socklen_t	len = sizeof(sockaddr_in);
+
+				if (getsockname(this->_servers[i]->socket, (sockaddr *) &addr, &len) == -1)
+				{
+					Logger::fail("Failed to add socket to epoll");
+					delete this->_servers[i];
+					this->_servers.erase(this->_servers.begin() + i--);
+					continue;
+				}
+
+				this->_servers[i]->target.first = addr.sin_addr.s_addr;
+				this->_servers[i]->target.second = addr.sin_port;
+
 				Logger::info("Server #" + String::tostr(i) + " running on socket: " + String::tostr(this->_servers[i]->socket));
 
 				event.data.fd = this->_servers[i]->socket;

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 21:47:29 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 21:02:55 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ Request::Request(const int &socket) :
 {
 }
 
-Request::Request(const Request &src) :
-	Abortable(src)
+Request::Request(const Request &src)
 {
 	*this = src;
 }
@@ -38,9 +37,11 @@ Request::recv()
 	stringstream	stream(h.substr(0, (p = h.find("\r\n", 0) + 2) - 2));
 
 	if (!(stream >> this->_method >> this->_target >> this->_version))
-		this->abort();
+		return (this->_status = 400, (void) NULL);
 	else
 	{
+		if (this->_version != "HTTP/1.1")
+			return (this->_status = 505, (void) NULL);
 		size_t	m;
 		if ((m = this->_target.find('?')) != string::npos)
 		{
@@ -94,6 +95,12 @@ Request::getParams() const
 	return (this->_params);
 }
 
+int
+Request::getSocket() const
+{
+	return (this->_socket);
+}
+
 size_t
 Request::getStatus() const
 {
@@ -109,7 +116,6 @@ Request::getTarget() const
 Request&
 Request::operator=(const Request &rhs)
 {
-	Abortable::operator=(rhs);
 	this->_header = rhs._header;
 	this->_length = rhs._length;
 	this->_method = rhs._method;

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 21:47:00 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/17 21:30:49 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 using namespace std;
 
-class Request : public Abortable
+class Request
 {
 	private  :
 		map<string,string>			_header;
@@ -46,6 +46,7 @@ class Request : public Abortable
 		string						getPacket() const;
 		string						getParams() const;
 		string						getTarget() const;
+		int							getSocket() const;
 		size_t						getStatus() const;
 
 		Request&					operator=(const Request &rhs);
