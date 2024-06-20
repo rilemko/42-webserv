@@ -1,33 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Gateway.hpp                                        :+:      :+:    :+:   */
+/*   Handler.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/07 18:27:09 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/20 18:20:41 by mconreau         ###   ########.fr       */
+/*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
+/*   Updated: 2024/06/20 18:00:47 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#include "Foundation/Handler.hpp"
 
-#include "Http/Request.hpp"
-#include <string>
-
-class Gateway
+Handler::Handler(const string &config)
 {
-	public   :
-		Gateway();
-		Gateway(const Gateway &src);
-		~Gateway();
-		Gateway&	operator=(const Gateway &rhs);
+}
 
-		void addenv(std::string key, std::string value);
-		char	**put_to_env();
-		std::string	cgirun(Request	req, std::string cgi);
-	public   :
-		std::vector<char *> v;
-		std::string	a;
-};
+Handler::Handler(const Handler &src)
+{
+	*this = src;
+}
 
+Handler::~Handler()
+{
+}
+
+bool
+Handler::run(const int &fd)
+{
+	(void) fd;
+}
+
+Handler&
+Handler::operator=(const Handler &rhs)
+{
+	(void) rhs;
+	return (*this);
+}

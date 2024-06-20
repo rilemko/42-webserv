@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 15:30:44 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/20 17:43:26 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,14 @@ using namespace std;
 class Route
 {
 	public   :
-		vector<string>				_method;
-		string						_target;
-		string						_upload;
+		string						passcgi;
+		bool						dirlst;
+		string						dindex;
+		vector<string>				method;
+		pair<size_t,string>			rewrite;
+		string						rooting;
+		string						target;
+		string						upload;
 
 	public   :
 									Route();

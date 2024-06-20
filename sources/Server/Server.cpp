@@ -6,15 +6,19 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 22:25:25 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/20 17:18:46 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server/Server.hpp"
 
 Server::Server() :
+	maxbdy(1048576),
 	socket(-1)
 {
+	this->listen.first = "0.0.0.0";
+	this->listen.second = "80";
+	this->snames.push_back("*");
 }
 
 Server::Server(const Server &src)
@@ -34,6 +38,14 @@ void
 Server::run()
 {
 	this->socket = Socket(this->listen);
+	for (size_t i = 0, j = this->routes.size(); i < j; i++)
+	{
+		if (i < j - 1 && this->routes[i]->target == "*")
+		{
+			this->routes.push_back(this->routes[i]);
+			this->routes.erase(this->routes.begin() + i--);
+		}
+	}
 }
 
 size_t
@@ -75,5 +87,6 @@ Server::operator=(const Server &rhs)
 	this->routes = rhs.routes;
 	this->snames = rhs.snames;
 	this->socket = rhs.socket;
+	this->target = rhs.target;
 	return (*this);
 }

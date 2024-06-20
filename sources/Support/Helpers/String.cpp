@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   String.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 16:06:15 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/14 19:01:03 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/20 17:18:26 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,8 @@ String::match(const string &pattern, const string &subject)
 		else
 			return (false);
 	}
-	while (j < m && pattern[j++] == '*');
+	while (j < m && pattern[j] == '*')
+		j++;
 	return (j == m);
 }
 

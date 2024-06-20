@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 14:19:32 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/20 18:20:26 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,10 +55,11 @@ char **Gateway::put_to_env()
 		return (envp);
 }
 
-void	Gateway::cgirun(Request	req)
+string	Gateway::cgirun(Request	req, string cgi)
 {
 	char **envp;
 
+	(void) cgi;
 	(void) envp;
 	addenv("REQUEST_METHOD=",req.getMethod());
 	addenv("SERVER_PROTOCOL=",req.getPacket());
@@ -67,5 +68,6 @@ void	Gateway::cgirun(Request	req)
 	// addenv("CONTENT_LENGTH=",req.getLength(), req);
 	envp = put_to_env();
 	//std::cout << envp[0] << std::endl;
+	return ("");
 }
 

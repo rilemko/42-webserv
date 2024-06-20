@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 22:17:21 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/20 19:36:15 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,28 +68,46 @@ Configuration::Configuration(const string &config, const int &epollfd)
 
 		// TEMP: Add one listener manually to 0.0.0.0:3000, must be created with parsing
 		this->_servers.push_back(new Server());
-		this->_servers[0]->listen.first = "0.0.0.0";
-		this->_servers[0]->listen.second = "3000";
-		this->_servers[0]->snames.push_back("*");
-		this->_servers[0]->routes.push_back(new Route());
-		this->_servers[0]->routes[0]->_target = "/get";
-		this->_servers[0]->routes[0]->_method.push_back("GET");
-		this->_servers[0]->routes.push_back(new Route());
-		this->_servers[0]->routes[1]->_target = "/post";
-		this->_servers[0]->routes[1]->_method.push_back("POST");
-		this->_servers[0]->errors[404] = "404.html";
+		this->_servers.back()->listen.first = "0.0.0.0";
+		this->_servers.back()->listen.second = "3000";
+		this->_servers.back()->routes.push_back(new Route()); // -------------------
+		this->_servers.back()->routes.back()->target = "*";
+		this->_servers.back()->routes.back()->rooting = "www///";
+		this->_servers.back()->routes.back()->method.clear();
+		this->_servers.back()->routes.back()->method.push_back("GET");
+		this->_servers.back()->routes.back()->method.push_back("POST");
+		this->_servers.back()->errors[404] = "www/error404.html";
+		this->_servers.back()->routes.push_back(new Route()); // -------------------
+		this->_servers.back()->routes.back()->target = "/get";
+		this->_servers.back()->routes.back()->method.clear();
+		this->_servers.back()->routes.back()->method.push_back("GET");
+		this->_servers.back()->routes.push_back(new Route()); // -------------------
+		this->_servers.back()->routes.back()->target = "/post";
+		this->_servers.back()->routes.back()->method.clear();
+		this->_servers.back()->routes.back()->method.push_back("POST");
+		this->_servers.back()->routes.push_back(new Route()); // -------------------
+		this->_servers.back()->routes.back()->target = "/r";
+		this->_servers.back()->routes.back()->method.clear();
+		this->_servers.back()->routes.back()->method.push_back("GET");
+		this->_servers.back()->routes.back()->rewrite.first = 307;
+		this->_servers.back()->routes.back()->rewrite.second = "https://google.com";
+		this->_servers.back()->routes.push_back(new Route()); // -------------------
+		this->_servers.back()->routes.back()->rooting = "www///";
+		this->_servers.back()->routes.back()->target = "/sub";
+		this->_servers.back()->routes.back()->dindex = "index.html";
+		this->_servers.back()->routes.back()->method.clear();
+		this->_servers.back()->routes.back()->method.push_back("GET");
 
 		// TEMP: Add a second listener manually to 0.0.0.0:3001, must be created with parsing
 		this->_servers.push_back(new Server());
-		this->_servers[1]->listen.first = "192.168.1.108";
-		this->_servers[1]->listen.second = "3001";
+		this->_servers.back()->listen.first = "192.168.1.108";
+		this->_servers.back()->listen.second = "3001";
 
 		// ==============================================
 		// Add all servers to epoll
 		// ==============================================
 
-		epoll_event	event;
-		event.events = EPOLLIN; // Setup event to trigger epoll only when data is received, not when data is sended
+		epoll_event	e = {EPOLLIN, {0}};
 
 		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing...
 		{
@@ -111,10 +129,10 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				this->_servers[i]->target.first = addr.sin_addr.s_addr;
 				this->_servers[i]->target.second = addr.sin_port;
 
-				Logger::info("Server #" + String::tostr(i) + " running on socket: " + String::tostr(this->_servers[i]->socket));
+				Logger::info("Server #" + String::tostr(i) + " listening on: " + this->_servers[i]->listen.first + ":" + this->_servers[i]->listen.second);
 
-				event.data.fd = this->_servers[i]->socket;
-				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, event.data.fd, &event) == -1) // Add server socket to epoll
+				e.data.fd = this->_servers[i]->socket;
+				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, e.data.fd, &e) == -1) // Add server socket to epoll
 				{
 					// Remove from vector<Server*> if fail
 					Logger::fail("Failed to add socket to epoll");

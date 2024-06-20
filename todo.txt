@@ -1,7 +1,7 @@
 [ ] TODO : Create the vector<Server*> by parsing instead of hard-add it in the "Configuration" class
 		- (i) Each "Server" class contains a vector<Route>
 [ ] TODO : Create all Routes in each Server's vector<Route> by parsing
-[>] TODO : Improve request format checking (in "Request" class) in the case the request is badly formatted or invalid
+[ ] TODO : Improve request format checking (in "Request" class) in the case the request is badly formatted or invalid
 [ ] TODO : Handle chunked request (with a map<int,string> ???)
 		- (?) Should we use HTTP code "100: Continue" until the last chunk ??
 		- First request must have "Transfer-Encoding: chunked" header.
@@ -12,15 +12,10 @@
 		0\r\n
 		\r\n
 [ ] TODO : Handle file uploading ("upload" directive for upload location)
-[ ] TODO : Handle redirection ("rewrite" directive, which contains the HTTP code and the new URL)
-[ ] TODO : Check file existence for the file targeted by the route
-		- (i) "Filesystem::isReg()" method do that
-		- If exists, read it and add it to "Response" body with the "addBody()" method, otherwise HTTP error
 [ ] TODO : Handle HTTP errors
 		- No route match (404), file is missing (404 ?), bad request (400), server problem (reading file problem ?) (500),
 		method not allowed (405), no content-length specified (411), wrong HTTP version (505), max request size (413)...
 		- Default error can just be a <h1> tag with "Error {code}" text if not specified in the config, or the file specified if there is one.
-[ ] TODO : Show file list if the URI is a directory (auto_index on/off directive)
 [ ] TODO : Handle CGI if needed (if the route match and has "cgi_pass" directive in it). Use the Gateway class
 		- The CGI program should normally write the whole response, with status code and headers included...
 [ ] TODO : Handle Ctrl-C to properly close the program (set "Application::_status" to false)
@@ -33,3 +28,8 @@
 [X] TODO : Handle "max_body_size" directive (413 HTTP error)
 [X] TODO : Matching server with "server_name" directive. "Server::match()" should take the "Request" as parameter
 [X] TODO : Matching route (location, "limit_to" directive (GET, POST...) and so..). "Route::match()" should be called inside "Server::match()".
+[X] TODO : Check file existence for the file targeted by the route
+		- (i) "Filesystem::isReg()" method do that
+		- If exists, read it and add it to "Response" body with the "addBody()" method, otherwise HTTP error
+[X] TODO : Show file list if the URI is a directory (auto_index on/off directive)
+[X] TODO : Handle redirection ("rewrite" directive, which contains the HTTP code and the new URL)

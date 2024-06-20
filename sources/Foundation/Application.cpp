@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 22:11:03 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/20 19:37:41 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,11 @@ bool
 Application::run()
 {
 	const int		hfd = this->_servers.size() ? this->_servers.back()->socket : 0;
-	epoll_event		events[32];
+	epoll_event		events[16];
 
 	for (int e, fd; this->_status;) // While _status == true (may be set to false by Ctrl-C)
 	{
-		if ((e = ::epoll_wait(this->_epollfd, events, 32, 2000)) == -1) // Wait until epoll trigger event or until 2000ms (for timeout check)
+		if ((e = ::epoll_wait(this->_epollfd, events, 16, 2000)) == -1) // Wait until epoll trigger event or until 2000ms (for timeout check)
 			return (this->abort("Failed to wait on epoll"));
 		for (int i = 0; i < e; i++) // For each triggered event from epoll (number of trigerred events is in "e")
 		{
@@ -86,7 +86,7 @@ Application::handle(const int &fd)
 
 	req.recv();
 
-	if (req.getStatus() != 200)
+	if ((status = req.getStatus()) != 200)
 	{
 		res.setStatus(status).addPacket(Template::error(req.getStatus())).send();
 		goto next;
@@ -118,7 +118,27 @@ Application::handle(const int &fd)
 							/ ICI, SERVER ET ROUTE TROUVÉ, LA REQUETE EST CONSTRUITE ET ENVOYÉ
 							/ ======================= */
 
-							res.setStatus(200).addPacket("<h1>Hello there!</h1>").send();
+							if (route->rewrite.first != 0)
+								res.setStatus(route->rewrite.first).addHeader("Location", route->rewrite.second).send();
+							else if (route->passcgi.size())
+							{
+								if (Filesystem::isDir(route->rooting + req.getTarget()) && route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + "/" + route->dindex))
+									req.setTarget(route->rooting + req.getTarget() + "/" + route->dindex);
+								res.send(Gateway().cgirun(req, route->passcgi));
+							}
+							else if (Filesystem::isReg(route->rooting + req.getTarget()))
+								res.setStatus(200).addPacket(Filesystem::get(route->rooting + req.getTarget())).send();
+							else if (Filesystem::isDir(route->rooting + req.getTarget()))
+							{
+								if (route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + "/" + route->dindex))
+									res.setStatus(200).addPacket(Filesystem::get(route->rooting + req.getTarget() + "/" + route->dindex)).send();
+								else if (route->dirlst)
+									res.setStatus(200).addPacket(Template::index(route->rooting + req.getTarget())).send();
+								else
+									res.setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+							}
+							else
+								res.setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							goto next;
 						}
 					}
@@ -136,29 +156,6 @@ Application::handle(const int &fd)
 		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
 	else
 		::close(fd); // Or close the fd
-
-
-	/*
-	Request		req(fd);
-	Response	res(fd);
-	//Gateway		cgi;
-
-	req.recv();
-
-	//cgi.cgirun(req);
-
-	res.setStatus(200);
-	res.addPacket("<h1>Hello there!</h1>");
-	//res.addPacket(Template::index("."));
-	//res.addPacket(Template::error(431));
-	res.send(); // Send the data to the socket
-
-	// if (String::lowercase(req.getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
-	if (String::lowercase(req.getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
-		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
-	else
-		::close(fd); // Or close the fd
-	*/
 }
 
 void

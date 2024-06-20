@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 21:02:55 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/20 18:25:36 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ Request::recv()
 	{
 		if (this->_version != "HTTP/1.1")
 			return (this->_status = 505, (void) NULL);
+		if (this->_target.size() > 2000)
+			return (this->_status = 414, (void) NULL);
 		size_t	m;
 		if ((m = this->_target.find('?')) != string::npos)
 		{
@@ -59,6 +61,8 @@ Request::recv()
 			string 	key(lne.substr(0, f = lne.find(':')));
 			string	val(lne.substr(f + 1));
 
+			if (val.size() > 8000)
+				return (this->_status = 431, (void) NULL);
 			this->_header[String::lowercase(String::strim(key, " "))] = String::strim(val, " \r\n");
 			p = e + 2;
 		}
@@ -111,6 +115,12 @@ string
 Request::getTarget() const
 {
 	return (this->_target);
+}
+
+void
+Request::setTarget(const string &target)
+{
+	this->_target = target;
 }
 
 Request&
