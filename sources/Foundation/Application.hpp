@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:25 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 20:46:22 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/22 22:59:31 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ using namespace std;
 class Application : public Abortable
 {
 	private  :
-		map<const int,Request>		_chunked;
+		map<const int,string>		_chunked;
 		map<const int,time_t>		_clients;
 		int							_epollfd;
 		vector<Server*>				_servers;
@@ -44,8 +44,9 @@ class Application : public Abortable
 	
 	private  :
 		void						add(const int &fd);
+		void						end(const int &fd);
 		void						handle(const int &fd);
-		void						timeout();
+		void						out();
 
 	public   :
 		Application&				operator=(const Application &rhs);

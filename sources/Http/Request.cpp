@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/20 18:25:36 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/22 20:34:22 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@ Request::recv()
 {
 	const string	packet(Filesystem::recv(this->_socket));
 
+	if (this->_packet.size())
+	{
+		if (packet[0] == '0')
+			this->_status = 200;
+		this->_packet = packet;
+		cout << packet << endl;
+		return ;
+	}
+	
 	size_t 			p = packet.find("\r\n\r\n");
 	const string 	h(packet.substr(0, p));
 	stringstream	stream(h.substr(0, (p = h.find("\r\n", 0) + 2) - 2));
@@ -66,6 +75,9 @@ Request::recv()
 			this->_header[String::lowercase(String::strim(key, " "))] = String::strim(val, " \r\n");
 			p = e + 2;
 		}
+
+		if (this->getHeader("transfer-encoding", "") == "chunked")
+			this->_status = 1;
 	}
 }
 
@@ -132,6 +144,8 @@ Request::operator=(const Request &rhs)
 	this->_packet = rhs._packet;
 	this->_params = rhs._params;
 	this->_socket = rhs._socket;
+	this->_status = rhs._status;
 	this->_target = rhs._target;
+	this->_version = rhs._version;
 	return (*this);
 }

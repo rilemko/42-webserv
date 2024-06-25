@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/20 19:37:41 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/25 13:19:40 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ Application::run()
 			else // Handle the data receveid on the socket "fd"
 				this->handle(fd);
 		}
-		this->timeout();
+		this->out();
 	}
 	return (this->_status);
 }
@@ -76,6 +76,14 @@ Application::add(const int &fd)
 }
 
 void
+Application::end(const int &fd)
+{
+	::close(fd);
+	this->_chunked.erase(fd);
+	this->_clients.erase(fd);
+}
+
+void
 Application::handle(const int &fd)
 {
 	Request		req(fd);
@@ -89,7 +97,7 @@ Application::handle(const int &fd)
 	if ((status = req.getStatus()) != 200)
 	{
 		res.setStatus(status).addPacket(Template::error(req.getStatus())).send();
-		goto next;
+		return (::close(fd), (void) NULL);
 	}
 
 	for (size_t i = 0; i < this->_servers.size(); i++)
@@ -122,16 +130,16 @@ Application::handle(const int &fd)
 								res.setStatus(route->rewrite.first).addHeader("Location", route->rewrite.second).send();
 							else if (route->passcgi.size())
 							{
-								if (Filesystem::isDir(route->rooting + req.getTarget()) && route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + "/" + route->dindex))
-									req.setTarget(route->rooting + req.getTarget() + "/" + route->dindex);
+								if (Filesystem::isDir(route->rooting + req.getTarget()) && route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + route->dindex))
+									req.setTarget(route->rooting + req.getTarget() + route->dindex);
 								res.send(Gateway().cgirun(req, route->passcgi));
 							}
 							else if (Filesystem::isReg(route->rooting + req.getTarget()))
 								res.setStatus(200).addPacket(Filesystem::get(route->rooting + req.getTarget())).send();
 							else if (Filesystem::isDir(route->rooting + req.getTarget()))
 							{
-								if (route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + "/" + route->dindex))
-									res.setStatus(200).addPacket(Filesystem::get(route->rooting + req.getTarget() + "/" + route->dindex)).send();
+								if (route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + route->dindex))
+									res.setStatus(200).addPacket(Filesystem::get(route->rooting + req.getTarget() + route->dindex)).send();
 								else if (route->dirlst)
 									res.setStatus(200).addPacket(Template::index(route->rooting + req.getTarget())).send();
 								else
@@ -159,18 +167,14 @@ Application::handle(const int &fd)
 }
 
 void
-Application::timeout()
+Application::out()
 {
 	const time_t	now = ::time(0);
 
 	for (map<const int,time_t>::iterator it = this->_clients.begin(); it != this->_clients.end();)
 	{
-		if (now - (it->second) > 2)
-		{
-			::close(it->first);
-			this->_chunked.erase(it->first);
-			this->_clients.erase(it++);
-		}
+		if (now - (it->second) > 10)
+			this->end((it++)->first);
 		else
 			++it;
 	}

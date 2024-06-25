@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 18:05:21 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/13 14:36:34 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/21 17:17:26 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ HttpStatus::~HttpStatus()
 string
 HttpStatus::get(const size_t &status)
 {
-	return (this->_status.find(status) != this->_status.end() ? this->_status[status] : "");
+	return (this->_status.find(status) != this->_status.end() ? this->_status[status] : this->_status[500]);
 }
 
 HttpStatus&

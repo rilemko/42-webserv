@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/20 18:25:41 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/22 20:04:26 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class Request
 									Request(const Request &src);
 									~Request();
 
+	public   :
 		void						recv();
 
 		string						getHeader(const string &key, const string &other);
@@ -48,7 +49,6 @@ class Request
 		string						getTarget() const;
 		int							getSocket() const;
 		size_t						getStatus() const;
-
 		void						setTarget(const string &target);
 
 		Request&					operator=(const Request &rhs);

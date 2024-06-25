@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/20 19:36:15 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/21 14:16:43 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 		this->_servers.back()->routes.push_back(new Route()); // -------------------
 		this->_servers.back()->routes.back()->rooting = "www///";
 		this->_servers.back()->routes.back()->target = "/sub";
-		this->_servers.back()->routes.back()->dindex = "index.html";
+		this->_servers.back()->routes.back()->dindex = "/index.html";
 		this->_servers.back()->routes.back()->method.clear();
 		this->_servers.back()->routes.back()->method.push_back("GET");
 
