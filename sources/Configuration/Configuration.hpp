@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/17 20:46:01 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/22 06:05:26 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ class Configuration : public Abortable
 									Configuration(const string &config, const int &epollfd);
 									Configuration(const Configuration& src);
 									~Configuration();
+
+		void						printConfig(void) const;
 
 		Configuration&				operator=(const Configuration& rhs);
 									operator vector<Server*>() const;

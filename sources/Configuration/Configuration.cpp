@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/20 19:36:15 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/24 16:32:52 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,11 @@ Configuration::Configuration(const string &config, const int &epollfd)
 	ifstream	stream(config.c_str());
 	size_t		context = 0, y = 0; // "context": 0 = none, 1 = server, 2 = route; "y": number of the line, can be used for error message if needed
 	string		line;
+	Server*		currentServer = NULL;
+	Route*		currentRoute = NULL;
 
 	if (!stream.is_open())
-		this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false et print message to stderr)
+		this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false and print message to stderr)
 	else
 	{
 		Logger::info("Reading configuration: " + config);
@@ -30,24 +32,32 @@ Configuration::Configuration(const string &config, const int &epollfd)
 			{
 				// Open server.
 				Logger::dump("Entering server #" + String::tostr(this->_servers.size() + 1));
+				currentServer = new Server;
 				++context;
 			}
 			else if (context == 1 && String::match("location ** {", line)) // If context == server and line match the pattern "location ** {"
 			{
 				// Open route.
 				Logger::dump("Open route: " + line);
+				currentRoute  = new Route;
+				size_t	pos = line.find(' ');
+				currentRoute->target = line.substr(pos + 1, line.find(' ', pos + 1) - pos - 1);
 				++context;
 			}
 			else if (context == 2 && line == "}") // If context == location and line == "}"
 			{
 				// Close route.
 				Logger::dump("Close route: " + line);
+				currentServer->routes.push_back(currentRoute);
+				currentRoute = NULL;
 				--context;
 			}
 			else if (context == 1 && line == "}") // If context == server and line == "}"
 			{
 				// Close server.
 				Logger::dump("Closing server #" + String::tostr(this->_servers.size() + 1));
+				this->_servers.push_back(currentServer);
+				currentServer = NULL;
 				--context;
 			}
 			else if (line.size()) // Otherwise, and if line is not empty
@@ -55,53 +65,59 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				if (context == 1)
 				{
 					// Server directive.
-					Logger::dump("Directive S: " + line);
+					Logger::dump("Add server directive: " + line);
+					currentServer->addDirective(line);
 				}
 				if (context == 2)
 				{
 					// Location directive.
-					Logger::dump("Directive L: " + line);
+					Logger::dump("Add route directive: " + line);
+					currentRoute->addDirective(line);
 				}
 			}
 		}
 		stream.close();
 
+		// TEMP
+		Logger::dump("Print config after parsing");
+		printConfig();
+
 		// TEMP: Add one listener manually to 0.0.0.0:3000, must be created with parsing
-		this->_servers.push_back(new Server());
-		this->_servers.back()->listen.first = "0.0.0.0";
-		this->_servers.back()->listen.second = "3000";
-		this->_servers.back()->routes.push_back(new Route()); // -------------------
-		this->_servers.back()->routes.back()->target = "*";
-		this->_servers.back()->routes.back()->rooting = "www///";
-		this->_servers.back()->routes.back()->method.clear();
-		this->_servers.back()->routes.back()->method.push_back("GET");
-		this->_servers.back()->routes.back()->method.push_back("POST");
-		this->_servers.back()->errors[404] = "www/error404.html";
-		this->_servers.back()->routes.push_back(new Route()); // -------------------
-		this->_servers.back()->routes.back()->target = "/get";
-		this->_servers.back()->routes.back()->method.clear();
-		this->_servers.back()->routes.back()->method.push_back("GET");
-		this->_servers.back()->routes.push_back(new Route()); // -------------------
-		this->_servers.back()->routes.back()->target = "/post";
-		this->_servers.back()->routes.back()->method.clear();
-		this->_servers.back()->routes.back()->method.push_back("POST");
-		this->_servers.back()->routes.push_back(new Route()); // -------------------
-		this->_servers.back()->routes.back()->target = "/r";
-		this->_servers.back()->routes.back()->method.clear();
-		this->_servers.back()->routes.back()->method.push_back("GET");
-		this->_servers.back()->routes.back()->rewrite.first = 307;
-		this->_servers.back()->routes.back()->rewrite.second = "https://google.com";
-		this->_servers.back()->routes.push_back(new Route()); // -------------------
-		this->_servers.back()->routes.back()->rooting = "www///";
-		this->_servers.back()->routes.back()->target = "/sub";
-		this->_servers.back()->routes.back()->dindex = "index.html";
-		this->_servers.back()->routes.back()->method.clear();
-		this->_servers.back()->routes.back()->method.push_back("GET");
+//		this->_servers.push_back(new Server());
+//		this->_servers.back()->listen.first = "0.0.0.0";
+//		this->_servers.back()->listen.second = "3000";
+//		this->_servers.back()->routes.push_back(new Route()); // -------------------
+//		this->_servers.back()->routes.back()->target = "*";
+//		this->_servers.back()->routes.back()->rooting = "www///";
+//		this->_servers.back()->routes.back()->method.clear();
+//		this->_servers.back()->routes.back()->method.push_back("GET");
+//		this->_servers.back()->routes.back()->method.push_back("POST");
+//		this->_servers.back()->errors[404] = "www/error404.html";
+//		this->_servers.back()->routes.push_back(new Route()); // -------------------
+//		this->_servers.back()->routes.back()->target = "/get";
+//		this->_servers.back()->routes.back()->method.clear();
+//		this->_servers.back()->routes.back()->method.push_back("GET");
+//		this->_servers.back()->routes.push_back(new Route()); // -------------------
+//		this->_servers.back()->routes.back()->target = "/post";
+//		this->_servers.back()->routes.back()->method.clear();
+//		this->_servers.back()->routes.back()->method.push_back("POST");
+//		this->_servers.back()->routes.push_back(new Route()); // -------------------
+//		this->_servers.back()->routes.back()->target = "/r";
+//		this->_servers.back()->routes.back()->method.clear();
+//		this->_servers.back()->routes.back()->method.push_back("GET");
+//		this->_servers.back()->routes.back()->rewrite.first = 307;
+//		this->_servers.back()->routes.back()->rewrite.second = "https://google.com";
+//		this->_servers.back()->routes.push_back(new Route()); // -------------------
+//		this->_servers.back()->routes.back()->rooting = "www///";
+//		this->_servers.back()->routes.back()->target = "/sub";
+//		this->_servers.back()->routes.back()->dindex = "index.html";
+//		this->_servers.back()->routes.back()->method.clear();
+//		this->_servers.back()->routes.back()->method.push_back("GET");
 
 		// TEMP: Add a second listener manually to 0.0.0.0:3001, must be created with parsing
-		this->_servers.push_back(new Server());
-		this->_servers.back()->listen.first = "192.168.1.108";
-		this->_servers.back()->listen.second = "3001";
+//		this->_servers.push_back(new Server());
+//		this->_servers.back()->listen.first = "192.168.1.108";
+//		this->_servers.back()->listen.second = "3001";
 
 		// ==============================================
 		// Add all servers to epoll
@@ -159,6 +175,15 @@ Configuration::Configuration(const Configuration &src) :
 
 Configuration::~Configuration()
 {
+}
+
+void
+Configuration::printConfig(void) const {
+	for (size_t i = 0; i < _servers.size(); ++i) {
+		cout << "Server " << i + 1 << ":" << endl;
+		_servers[i]->PrintServer();
+		cout << endl;
+	}
 }
 
 
