@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/19 19:04:36 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/24 14:25:13 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include "Server/Route.hpp"
 #include <map>
 #include <string>
+#include <cstdlib> // for atoi
 
 using namespace std;
 
@@ -40,9 +41,18 @@ class Server
 									~Server();
 
 		void						run();
+		void						addDirective(const string &directive);
+		void						PrintServer(void) const;
 
 		size_t						check(Request &request) const;
 		bool						match(Request &request) const;
 
 		Server&						operator=(const Server &rhs);
+
+	private   :
+		void						handleErrorsPage(const string &value);
+		void						handleListen(const string &value);
+		void						handleMaxBodySize(const string &value);
+		void						handleServerName(const string &value);
+
 };
