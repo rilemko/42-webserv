@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/25 10:07:05 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/27 22:32:05 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,21 +28,19 @@ Server::Server(const Server &src)
 
 Server::~Server()
 {
-	Logger::logs("Closing server: " + this->listen.first + ":" + this->listen.second);
+	Logger::logs("Closing server: " + this->listen.first + ":" + this->listen.second + ".");
 	Vector::free(this->routes);
 	this->routes.clear();
-	if (this->socket != -1) {
-		::close(this->socket);
-	}
+	::close(this->socket);
 }
 
 void
 Server::run()
 {
 	this->socket = Socket(this->listen);
-	for (size_t i = 0, j = this->routes.size(); i < j; i++)
+	for (size_t i = 0, j = this->routes.size() - 1; i < j; i++)
 	{
-		if (i < j - 1 && this->routes[i]->target == "*")
+		if (i < j && this->routes[i]->target == "*")
 		{
 			this->routes.push_back(this->routes[i]);
 			this->routes.erase(this->routes.begin() + i--);
@@ -72,12 +70,13 @@ Server::addDirective(const string &directive)
 	} else if (key == "server_name") {
 		handleServerName(value);
 	} else {
-		Logger::warn("Unknown server directive ; " + directive);
+		Logger::warn("Unknown server directive : " + directive);
 	}
 }
 
 void
-Server::PrintServer() const {
+Server::PrintServer() const
+{
 	cout << "Errors: " << endl;
 	for (map<int, string>::const_iterator it = errors.begin(); it != errors.end(); ++it) {
 		cout << "Error " << it->first << ": " << it->second << endl;
@@ -112,7 +111,7 @@ Server::match(Request &request) const
 	sockaddr_in	addr;
 	socklen_t	len = sizeof(sockaddr_in);
 
-    if (getsockname(request.getSocket(), (sockaddr *) &addr, &len) == -1)
+    if (::getsockname(request.getSocket(), (sockaddr *) &addr, &len) == -1)
 		return (Logger::fail("Failed to get socket information"), false);
 	if ((this->target.first == 0 || this->target.first == addr.sin_addr.s_addr) && this->target.second == addr.sin_port)
 	{
@@ -144,13 +143,14 @@ Server::operator=(const Server &rhs)
 }
 
 void
-Server::handleErrorsPage(const std::string &value) {
-	std::stringstream ss(value);
-	std::vector<int> codes;
-	std::string token;
-	std::string page;
+Server::handleErrorsPage(const string &value)
+{
+	stringstream 	ss(value);
+	vector<int> 	codes;
+	string			token;
+	string 			page;
+	vector<string>	tokens;
 
-	std::vector<std::string> tokens;
 	while (ss >> token) {
 		tokens.push_back(token);
 	}
@@ -161,7 +161,7 @@ Server::handleErrorsPage(const std::string &value) {
 	page = tokens.back();	// last one contains the page
 	tokens.pop_back();
 	for (size_t i = 0; i < tokens.size(); ++i) {
-		int code = atoi(tokens[i].c_str());
+		int code = ::atoi(tokens[i].c_str());
 		if (code < 100 || code > 599) {
 			Logger::warn("Invalid error code. Skipping...");
 			continue;

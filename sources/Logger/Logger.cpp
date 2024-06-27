@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 11:55:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/05/10 19:27:26 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/27 21:27:29 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,5 @@ Logger::warn(const string &message)
 void
 Logger::write(const string &level, const string &message)
 {
-	IO::out("[" + Datetime() + "][" + level + "] " + message + "\n");
+	IO::out("\r\r\r\r[" + Datetime() + "][" + level + "] " + message + "\n");
 }

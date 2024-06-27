@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/24 22:19:29 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/25 13:24:30 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,10 @@ using namespace std;
 class Route
 {
 	public   :
-		string						passcgi;
 		bool						dirlst;
 		string						dindex;
 		vector<string>				method;
+		string						passcgi;
 		pair<size_t,string>			rewrite;
 		string						rooting;
 		string						target;

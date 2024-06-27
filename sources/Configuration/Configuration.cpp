@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/25 13:20:30 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/27 22:02:55 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				this->_servers[i]->target.first = addr.sin_addr.s_addr;
 				this->_servers[i]->target.second = addr.sin_port;
 
-				Logger::info("Server #" + String::tostr(i) + " listening on: " + this->_servers[i]->listen.first + ":" + this->_servers[i]->listen.second);
+				Logger::info("Server listen on: " + this->_servers[i]->listen.first + ":" + this->_servers[i]->listen.second + ".");
 
 				e.data.fd = this->_servers[i]->socket;
 				if (epoll_ctl(epollfd, EPOLL_CTL_ADD, e.data.fd, &e) == -1) // Add server socket to epoll
@@ -178,10 +178,12 @@ Configuration::~Configuration()
 }
 
 void
-Configuration::printConfig(void) const {
-	for (size_t i = 0; i < _servers.size(); ++i) {
+Configuration::printConfig(void) const
+{
+	for (size_t i = 0; i < _servers.size(); ++i)
+	{
 		cout << "Server " << i + 1 << ":" << endl;
-		_servers[i]->PrintServer();
+		this->_servers[i]->PrintServer();
 		cout << endl;
 	}
 }

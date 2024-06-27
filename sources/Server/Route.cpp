@@ -3,22 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/25 08:59:55 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/27 17:37:14 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server/Route.hpp"
 
 Route::Route() :
-	passcgi(""),
 	dirlst(true),
 	dindex("index.html"),
-	rewrite(std::make_pair(0, "")),
-	rooting("www"),
-    upload("")
+	rooting("www")
 {
 	this->method.push_back("GET");
 	this->method.push_back("POST");
@@ -31,16 +28,9 @@ Route::Route() :
 	this->method.push_back("PATCH");
 }
 
-Route::Route(const Route &src) :
-	passcgi(src.passcgi),
-	dirlst(src.dirlst),
-	dindex(src.dindex),
-	method(src.method),
-	rewrite(src.rewrite),
-	rooting(src.rooting),
-	target(src.target),
-	upload(src.upload)
+Route::Route(const Route &src)
 {
+	*this = src;
 }
 
 Route::~Route()
@@ -80,7 +70,8 @@ Route::addDirective(const string &directive)
 }
 
 void
-Route::printRoute(void) const {
+Route::printRoute(void) const
+{
 	cout << "Route Details:" << endl;
 	cout << "  Pass CGI: " << passcgi << endl;
 	cout << "  Directory Listing: " << (dirlst ? "on" : "off") << endl;
@@ -114,65 +105,72 @@ Route::match(Request &request) const
 Route&
 Route::operator=(const Route &rhs)
 {
-	if (this != &rhs) {
-		passcgi = rhs.passcgi;
-		dirlst = rhs.dirlst;
-		dindex = rhs.dindex;
-		method = rhs.method;
-		rewrite = rhs.rewrite;
-		rooting = rhs.rooting;
-		target = rhs.target;
-		upload = rhs.upload;
-	}
+	this->dirlst = rhs.dirlst;
+	this->dindex = rhs.dindex;
+	this->method = rhs.method;
+	this->passcgi = rhs.passcgi;
+	this->rewrite = rhs.rewrite;
+	this->rooting = rhs.rooting;
+	this->target = rhs.target;
+	this->upload = rhs.upload;
 	return (*this);
 }
 
 void
-Route::handleCgiPass(const string &value) {
+Route::handleCgiPass(const string &value)
+{
 	this->passcgi = value;
 }
 
 void
-Route::handleListing(const string &value) {
+Route::handleListing(const string &value)
+{
 	this->dirlst = (value == "on");
 }
 
 void
-Route::handleIndex(const string &value) {
+Route::handleIndex(const string &value)
+{
 	this->dindex = value;
 }
 
 void
-Route::handleMethods(const string &value) {
-	if (value == "*" || value.empty()) {
+Route::handleMethods(const string &value)
+{
+	if (value == "*" || value.empty())
+	{
 		return;
 	}
 	stringstream ss(value);
 	string method;
 	this->method.clear();
-	while (ss >> method) {
+	while (ss >> method)
+	{
 		this->method.push_back(method);
 	}
 }
 
 void
-Route::handleRewrite(const string &value) {
-	std::stringstream ss(value);
+Route::handleRewrite(const string &value)
+{
+	stringstream ss(value);
 	size_t code;
-	std::string url;
+	string url;
 	if (!(ss >> code >> url)) {
 		Logger::warn("Rewrite directive invalid. Skipping...");
 		return;
 	}
-	this->rewrite = std::make_pair(code, url);
+	this->rewrite = ::make_pair(code, url);
 }
 
 void
-Route::handleRoot(const string &value) {
+Route::handleRoot(const string &value)
+{
 	this->rooting = value;
 }
 
 void
-Route::handleUploadTo(const string &value) {
+Route::handleUploadTo(const string &value)
+{
 	this->upload = value;
 }

@@ -6,12 +6,14 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/25 13:19:40 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/27 22:39:34 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Foundation/Application.hpp"
 #include "Gateway/Gateway.hpp"
+
+bool	Application::_running = true;
 
 Application::Application(const string &config) :
 	_epollfd(epoll_create(1)),
@@ -23,6 +25,7 @@ Application::Application(const string &config) :
 		this->abort("No server to listen on.");
 	else if (!config.size())
 		Logger::warn("Default configuration file used.");
+	signal(SIGINT, &Application::stop);
 }
 
 Application::Application(const Application &src) :
@@ -41,16 +44,23 @@ Application::~Application()
 	::close(this->_epollfd);
 }
 
+void
+Application::stop(int i)
+{
+	(void) i;
+	Application::_running = false;
+}
+
 bool
 Application::run()
 {
 	const int		hfd = this->_servers.size() ? this->_servers.back()->socket : 0;
 	epoll_event		events[16];
 
-	for (int e, fd; this->_status;) // While _status == true (may be set to false by Ctrl-C)
+	for (int e, fd; this->_running;) // While _status == true (may be set to false by Ctrl-C)
 	{
 		if ((e = ::epoll_wait(this->_epollfd, events, 16, 2000)) == -1) // Wait until epoll trigger event or until 2000ms (for timeout check)
-			return (this->abort("Failed to wait on epoll"));
+			return (this->abort(Application::_running ? "Failed to wait on epoll" : ""));
 		for (int i = 0; i < e; i++) // For each triggered event from epoll (number of trigerred events is in "e")
 		{
 			if ((fd = events[i].data.fd) <= hfd) // If the "fd" triggered by epoll is one of the servers socket (<= "hfd"), it's a first connection from a new client
@@ -78,46 +88,60 @@ Application::add(const int &fd)
 void
 Application::end(const int &fd)
 {
-	::close(fd);
-	this->_chunked.erase(fd);
+	if (this->_chunked.find(fd) != this->_chunked.end())
+	{
+		delete this->_chunked[fd];
+		this->_chunked.erase(fd);
+	}
 	this->_clients.erase(fd);
+	::close(fd);
 }
 
 void
 Application::handle(const int &fd)
 {
-	Request		req(fd);
-	Response	res(fd);
+	Request		*req = this->_chunked.find(fd) != this->_chunked.end() ? this->_chunked[fd] : new Request(fd);
 	Server		*server;
 	Route		*route;
 	size_t		status;
 
-	req.recv();
-
-	if ((status = req.getStatus()) != 200)
+	req->recv();
+	
+	if (req->getHeader("transfer-encoding", "") == "chunked" && this->_chunked.find(fd) == this->_chunked.end())
 	{
-		res.setStatus(status).addPacket(Template::error(req.getStatus())).send();
-		return (::close(fd), (void) NULL);
+		this->_chunked[fd] = req;
+		return ;
+	}
+
+	if ((status = req->getStatus()) == 1)
+		return ;
+	
+	this->_chunked.erase(fd);
+
+	if ((status = req->getStatus()) != 200)
+	{
+		Response(fd).setStatus(status).addPacket(Template::error(req->getStatus())).send();
+		return (delete req, this->end(fd), (void) NULL);
 	}
 
 	for (size_t i = 0; i < this->_servers.size(); i++)
 	{
-		if ((server = this->_servers[i])->match(req))
+		if ((server = this->_servers[i])->match(*req))
 		{
-			if ((status = server->check(req)) != 200)
+			if ((status = server->check(*req)) != 200)
 			{
-				res.setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
+				Response(fd).setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
 				goto next;
 			}
 			else
 			{
 				for (size_t j = 0; j < server->routes.size(); j++)
 				{
-					if ((route = server->routes[j])->match(req))
+					if ((route = server->routes[j])->match(*req))
 					{
-						if ((status = route->check(req)) != 200)
+						if ((status = route->check(*req)) != 200)
 						{
-							res.setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
+							Response(fd).setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
 							goto next;
 						}
 						else
@@ -126,44 +150,47 @@ Application::handle(const int &fd)
 							/ ICI, SERVER ET ROUTE TROUVÉ, LA REQUETE EST CONSTRUITE ET ENVOYÉ
 							/ ======================= */
 
+							//cout << "-" << req->getPacket() << "-" << endl;
+
 							if (route->rewrite.first != 0)
-								res.setStatus(route->rewrite.first).addHeader("Location", route->rewrite.second).send();
+								Response(fd).setStatus(route->rewrite.first).addHeader("Location", route->rewrite.second).send();
 							else if (route->passcgi.size())
 							{
-								if (Filesystem::isDir(route->rooting + req.getTarget()) && route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + route->dindex))
-									req.setTarget(route->rooting + req.getTarget() + route->dindex);
-								res.send(Gateway().cgirun(req, route->passcgi));
+								if (Filesystem::isDir(route->rooting + req->getTarget()) && route->dindex.size() && Filesystem::isReg(route->rooting + req->getTarget() + route->dindex))
+									req->setTarget(route->rooting + req->getTarget() + route->dindex);
+								Response(fd).send(Gateway().cgirun(*req, route->passcgi));
 							}
-							else if (Filesystem::isReg(route->rooting + req.getTarget()))
-								res.setStatus(200).addPacket(Filesystem::get(route->rooting + req.getTarget())).send();
-							else if (Filesystem::isDir(route->rooting + req.getTarget()))
+							else if (Filesystem::isReg(route->rooting + req->getTarget()))
+								Response(fd).setStatus(200).addPacket(Filesystem::get(route->rooting + req->getTarget())).send();
+							else if (Filesystem::isDir(route->rooting + req->getTarget()))
 							{
-								if (route->dindex.size() && Filesystem::isReg(route->rooting + req.getTarget() + route->dindex))
-									res.setStatus(200).addPacket(Filesystem::get(route->rooting + req.getTarget() + route->dindex)).send();
+								if (route->dindex.size() && Filesystem::isReg(route->rooting + req->getTarget() + route->dindex))
+									Response(fd).setStatus(200).addPacket(Filesystem::get(route->rooting + req->getTarget() + route->dindex)).send();
 								else if (route->dirlst)
-									res.setStatus(200).addPacket(Template::index(route->rooting + req.getTarget())).send();
+									Response(fd).setStatus(200).addPacket(Template::index(route->rooting + req->getTarget())).send();
 								else
-									res.setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+									Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							}
 							else
-								res.setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+								Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							goto next;
 						}
 					}
 				}
-				res.setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+				Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 				goto next;
 			}
 		}
 	}
-	res.setStatus(404).addPacket(Template::error(404)).send();
+	Response(fd).setStatus(404).addPacket(Template::error(404)).send();
 	next: ;
 
-	// if (String::lowercase(req.getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
-	if (String::lowercase(req.getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
+	// if (String::lowercase(req->getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
+	if (String::lowercase(req->getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
 		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
 	else
 		::close(fd); // Or close the fd
+	delete req;
 }
 
 void
