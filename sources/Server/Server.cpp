@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/27 22:32:05 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/28 20:31:44 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,16 +178,25 @@ Server::handleErrorsPage(const string &value)
 void
 Server::handleListen(const string &value)
 {
-	size_t pos = value.find(':');
-	if (pos != string::npos)
+	size_t pos1 = value.find(':');
+	if (pos1 != string::npos)
 	{
-		this->listen.first = value.substr(0, pos);
-		this->listen.second = value.substr(pos + 1);
+		if (!value.substr(0, pos1).empty()) {
+			this->listen.first = value.substr(0, pos1);
+		}
+		if (!value.substr(pos1 + 1).empty()) {
+			this->listen.second = value.substr(pos1 + 1);
+		}
 	}
 	else
 	{
-		this->listen.first = "0.0.0.0";
-		this->listen.second = value;
+		size_t pos2 = value.find('.');
+		if (pos2 != string::npos) {
+			this->listen.first = value;
+		}
+		else {
+			this->listen.second = value;
+		}
 	}
 }
 
