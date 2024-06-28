@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/27 17:37:14 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/28 10:08:24 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,12 @@ Route::handleListing(const string &value)
 void
 Route::handleIndex(const string &value)
 {
-	this->dindex = value;
+	if (value[0] == '/') {
+		this->dindex = value;
+	}
+	else {
+		this->dindex = "/" + value;
+	}
 }
 
 void
