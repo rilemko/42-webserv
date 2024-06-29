@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/28 20:31:44 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/28 22:03:09 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,25 +178,33 @@ Server::handleErrorsPage(const string &value)
 void
 Server::handleListen(const string &value)
 {
-	size_t pos1 = value.find(':');
+	stringstream 	ss(value);
+	string firstValue;
+
+	ss >> firstValue;
+	size_t pos1 = firstValue.find(':');
 	if (pos1 != string::npos)
 	{
 		if (!value.substr(0, pos1).empty()) {
-			this->listen.first = value.substr(0, pos1);
+			this->listen.first = firstValue.substr(0, pos1);
 		}
 		if (!value.substr(pos1 + 1).empty()) {
-			this->listen.second = value.substr(pos1 + 1);
+			this->listen.second = firstValue.substr(pos1 + 1);
 		}
 	}
 	else
 	{
-		size_t pos2 = value.find('.');
+		size_t pos2 = firstValue.find('.');
 		if (pos2 != string::npos) {
-			this->listen.first = value;
+			this->listen.first = firstValue;
 		}
 		else {
-			this->listen.second = value;
+			this->listen.second = firstValue;
 		}
+	}
+	string extraParam;
+	while (ss >> extraParam) {
+		Logger::warn("Skipping extra parameter: " + extraParam);
 	}
 }
 
