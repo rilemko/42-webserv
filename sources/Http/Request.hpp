@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/27 15:55:01 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/28 11:16:06 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Request
 
 	public   :
 		void						recv();
+		void						unchunk(const string &packet);
 
 		string						getHeader(const string &key, const string &other);
 		size_t						getLength() const;
