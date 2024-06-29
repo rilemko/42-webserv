@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/27 22:02:55 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/28 10:30:57 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,9 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				currentRoute  = new Route;
 				size_t	pos = line.find(' ');
 				currentRoute->target = line.substr(pos + 1, line.find(' ', pos + 1) - pos - 1);
+				if (currentRoute->target == "/") {
+					currentRoute->target = "*";
+				}
 				++context;
 			}
 			else if (context == 2 && line == "}") // If context == location and line == "}"
@@ -74,6 +77,9 @@ Configuration::Configuration(const string &config, const int &epollfd)
 					Logger::dump("Add route directive: " + line);
 					currentRoute->addDirective(line);
 				}
+			}
+			else {
+				Logger::warn("Line: " + String::tostr(y) + ". Unrecognized directive: " + line + ". Skipping...");
 			}
 		}
 		stream.close();
