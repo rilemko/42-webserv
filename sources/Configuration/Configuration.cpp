@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/28 10:30:57 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/29 18:11:02 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				{
 					// Server directive.
 					Logger::dump("Add server directive: " + line);
-					currentServer->addDirective(line);
+					currentServer->addDirective(y, line);
 				}
 				if (context == 2)
 				{
@@ -77,6 +77,9 @@ Configuration::Configuration(const string &config, const int &epollfd)
 					Logger::dump("Add route directive: " + line);
 					currentRoute->addDirective(line);
 				}
+			}
+			else if (!line.size()) {
+				// skip empty line
 			}
 			else {
 				Logger::warn("Line: " + String::tostr(y) + ". Unrecognized directive: " + line + ". Skipping...");

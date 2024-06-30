@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/28 22:03:09 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/30 22:24:44 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,14 @@ Server::run()
 }
 
 void
-Server::addDirective(const string &directive)
+Server::addDirective(const int lineNumber, const string &directive)
 {
 	string key, value;
 	stringstream ss(directive);
 
 	ss >> key;
 	if (!getline(ss, value)) {
-		Logger::warn("Failed to read server directive. skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to read server directive. skipping...");
 		return;
 	}
 	value = String::strim(value, " \f\r\t\v");
@@ -66,7 +66,7 @@ Server::addDirective(const string &directive)
 	} else if (key == "listen") {
 		handleListen(value);
 	} else if (key == "max_body_size") {
-		handleMaxBodySize(value);
+		handleMaxBodySize(lineNumber, value);
 	} else if (key == "server_name") {
 		handleServerName(value);
 	} else {
@@ -178,7 +178,7 @@ Server::handleErrorsPage(const string &value)
 void
 Server::handleListen(const string &value)
 {
-	stringstream 	ss(value);
+	stringstream ss(value);
 	string firstValue;
 
 	ss >> firstValue;
@@ -209,18 +209,35 @@ Server::handleListen(const string &value)
 }
 
 void
-Server::handleMaxBodySize(const string &value)
+Server::handleMaxBodySize(const int lineNumber, const string &value)
 {
-	stringstream ss(value);
-	size_t	maxbdyValue;
-	ss >> maxbdyValue;
-	if (ss.fail() || !ss.eof())
+	if (value.empty())
 	{
-		Logger::warn("Failed to convert maxbdy value, default value used.");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". No value set for maxbdy. Skipping...");
+		return;
+	}
+	if (value[0] == '-')
+	{
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Negative value is not possible for maxbdy. Skipping...");
+		return;
+	}
+	stringstream ss(value);
+	size_t maxbdyValue = 0;
+	ss >> maxbdyValue;
+	if (ss.fail())
+	{
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to convert maxbdy value. Skipping...");
+		return;
+	}
+	if (!ss.eof()) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Too many arguments, first value used to setup maxbdy.");
+	}
+	if (maxbdyValue < 100000) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". maxbdy value too low. Skipping...");
 	}
 	else
 	{
-		this->maxbdy = maxbdyValue;
+		this->maxbdy =  maxbdyValue;
 	}
 }
 

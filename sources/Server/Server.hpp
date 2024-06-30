@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/24 14:25:13 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/29 17:11:00 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class Server
 									~Server();
 
 		void						run();
-		void						addDirective(const string &directive);
+		void						addDirective(const int lineNumber, const string &directive);
 		void						PrintServer(void) const;
 
 		size_t						check(Request &request) const;
@@ -52,7 +52,7 @@ class Server
 	private   :
 		void						handleErrorsPage(const string &value);
 		void						handleListen(const string &value);
-		void						handleMaxBodySize(const string &value);
+		void						handleMaxBodySize(const int lineNumber, const string &value);
 		void						handleServerName(const string &value);
 
 };
