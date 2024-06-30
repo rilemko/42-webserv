@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:09 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 16:57:26 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/30 14:41:14 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ class Gateway
 		const char *getAbsolutePathOfFile(const char *fileName);
 		void	 addenv(const std::string& key, const std::string& value);
 		char	**put_to_env();
-		std::string	cgirun(Request& req, std::string passcgi);
+		std::string	cgirun(Request& req, const string &passcgi, const string &script);
 	public   :
 		std::vector<std::string> v;
 };

@@ -6,26 +6,31 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 12:54:17 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/30 15:11:51 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Foundation/Application.hpp"
-#include "Gateway/Gateway.hpp"
 
 bool	Application::_running = true;
 
-Application::Application(const string &config) :
+Application::Application(const string &config, const string &basedir) :
+	_basedir(basedir),
 	_epollfd(epoll_create(1)),
 	_servers(this->_epollfd != -1 ? Configuration(config.size() ? config : "config/default.cfg", this->_epollfd) : vector<Server*>())
 {
-	if (this->_epollfd == -1)
+	if (!this->_basedir.size())
+		this->abort("Failed to find current directory.");
+	else if (this->_epollfd == -1)
 		this->abort("Failed to create epoll instance.");
 	else if (!this->_servers.size())
 		this->abort("No server to listen on.");
-	else if (!config.size())
-		Logger::warn("Default configuration file used.");
-	signal(SIGINT, &Application::stop);
+	else
+	{
+		if (!config.size())
+			Logger::warn("Default configuration file used.");
+		signal(SIGINT, &Application::stop);
+	}
 }
 
 Application::Application(const Application &src) :
@@ -57,7 +62,7 @@ Application::run()
 	const int		hfd = this->_servers.size() ? this->_servers.back()->socket : 0;
 	epoll_event		events[16];
 
-	for (int e, fd; this->_running;) // While _status == true (may be set to false by Ctrl-C)
+	for (int e, fd; this->_running && this->_status;) // While _status == true (may be set to false by Ctrl-C)
 	{
 		if ((e = ::epoll_wait(this->_epollfd, events, 16, 2000)) == -1) // Wait until epoll trigger event or until 2000ms (for timeout check)
 			return (this->abort(Application::_running ? "Failed to wait on epoll" : ""));
@@ -150,9 +155,13 @@ Application::handle(const int &fd)
 								Response(fd).setStatus(route->rewrite.first).addHeader("Location", route->rewrite.second).send();
 							else if (route->passcgi.size())
 							{
+								const string	t = route->rooting + req->getTarget();
 								if (Filesystem::isDir(route->rooting + req->getTarget()) && route->dindex.size() && Filesystem::isReg(route->rooting + req->getTarget() + route->dindex))
-									req->setTarget(route->rooting + req->getTarget() + route->dindex);
-								Response(fd).send(Gateway().cgirun(*req, route->passcgi));
+									Response(fd).send(Gateway().cgirun(*req, route->passcgi, this->_basedir + "/" + t + route->dindex));
+								else if (Filesystem::isReg(route->rooting + req->getTarget()))
+									Response(fd).send(Gateway().cgirun(*req, route->passcgi, this->_basedir + "/" + t));
+								else
+									Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							}
 							else if (Filesystem::isReg(route->rooting + req->getTarget()))
 								Response(fd).addPacket(Filesystem::get(route->rooting + req->getTarget())).send();
