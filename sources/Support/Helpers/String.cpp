@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   String.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 16:06:15 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/20 17:18:26 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/29 16:57:29 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,4 +128,12 @@ String::uppercase(string subject)
 	for (int i = 0, j = subject.size(); i < j; i++)
 		subject[i] = ::toupper(subject[i]);
 	return (subject);
+}
+
+void String::custom_strcpy(char* dest, const char* src) 
+{
+    while (*src) {
+        *dest++ = *src++;
+    }
+    *dest = '\0';
 }

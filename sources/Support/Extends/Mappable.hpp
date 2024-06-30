@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/09 18:54:48 by mconreau          #+#    #+#             */
-/*   Updated: 2024/05/08 16:17:26 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/30 13:26:12 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ using namespace std;
 template<typename KEY, typename VAL>
 class Mappable
 {
-	private  :
+	protected:
 		map<KEY,VAL>				_map;
 
 	protected:

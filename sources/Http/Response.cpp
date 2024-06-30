@@ -6,14 +6,14 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/18 20:03:06 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/30 12:41:12 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Http/Response.hpp"
 
 Response::Response(const int &socket) :
-	_header("HTTP/1.1 %1 %2\r\nServer: webserv\r\n"),
+	_header("HTTP/1.1 %1 %2\r\nServer: Webserv/1.0.0\r\n"),
 	_packet("\r\n"),
 	_socket(socket),
 	_status(200)

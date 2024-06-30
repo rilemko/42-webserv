@@ -6,68 +6,159 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/21 20:10:45 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/30 15:17:57 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string.h>
 #include "Gateway/Gateway.hpp"
-#include "Http/Request.hpp"
 
-Gateway::Gateway()
-{
-}
+Gateway::Gateway() {}
 
-Gateway::Gateway(const Gateway &src)
-{
+Gateway::Gateway(const Gateway &src) {
 	*this = src;
 }
 
-Gateway::~Gateway()
-{
+Gateway::~Gateway() {}
+
+Gateway& Gateway::operator=(const Gateway &rhs) {
+	if (this != &rhs) {
+		this->v = rhs.v;
+	}
+	return *this;
 }
 
-Gateway& Gateway::operator=(const Gateway &rhs)
-{
-	(void) rhs;
-	return (*this);
+void Gateway::addenv(const std::string& key, const std::string& value) {
+	std::string str = key + "=" + value;
+	v.push_back(str);
 }
 
-void	Gateway::addenv(std::string key, std::string value)
-{
-	//lenght
-
-	std::string str = key + value;
-	v.push_back(strdup(str.c_str()));
-
-	// For adding char* to vector. But it's better to add const char* to a vector<const char*> anyway for performance
-	// v.push_back(&str[0]);
+char** Gateway::put_to_env() {
+	char** envp = new char*[v.size() + 1];
+	for (size_t i = 0; i < v.size(); ++i) {
+		envp[i] = new char[v[i].size() + 1];
+		String::custom_strcpy(envp[i], v[i].c_str());
+	}
+	envp[v.size()] = NULL;
+	return envp;	
 }
 
-char **Gateway::put_to_env()
-{
-		char **envp = new char*[v.size() + 1];
-		size_t i;
+const char *Gateway::getAbsolutePathOfFile(const char *fileName) {
+   static char absPath[PATH_MAX];
 
-		for (i = 0; i < v.size(); ++i)
-			envp[i] = v[i];
-		envp[i] = 0;
-		return (envp);
+	DIR* dir = opendir(".");
+	if (dir == NULL) {
+		std::cerr << "Error in opendir: " << strerror(errno) << std::endl;
+		return NULL;
+	}
+
+	struct dirent* entry;
+	while ((entry = readdir(dir)) != NULL) {
+		if (entry->d_type == DT_REG) { // Check if it's a regular file
+			if (std::strcmp(entry->d_name, fileName) == 0) {
+				String::custom_strcpy(absPath, "./");
+				std::strcat(absPath, entry->d_name);
+				closedir(dir);
+				return absPath;
+			}
+		}
+	}
+	closedir(dir);
+
+	std::cerr << "File not found: " << fileName << std::endl;
+	return NULL;
 }
 
-string	Gateway::cgirun(Request	req, string cgi)
+std::string Gateway::cgirun(Request& req, const string &passcgi, const string &script)
 {
-	char **envp;
+	int pipefd[2];
+	if (pipe(pipefd) == -1) {
+		perror("pipe");
+		return "";
+	}
 
-	(void) cgi;
-	(void) envp;
-	addenv("REQUEST_METHOD=",req.getMethod());
-	addenv("SERVER_PROTOCOL=",req.getPacket());
-	addenv("Co=",req.getMethod());
-	// addenv("REQUEST_METHOD=",req.getMethod());
-	// addenv("CONTENT_LENGTH=",req.getLength(), req);
-	envp = put_to_env();
-	//std::cout << envp[0] << std::endl;
-	return ("");
+	pid_t pid = fork();
+	if (pid == -1) {
+		perror("fork");
+		close(pipefd[0]);
+		close(pipefd[1]);
+		return "";
+	}
+
+	if (pid == 0) {
+		close(pipefd[0]);
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
+			perror("dup2");
+			close(pipefd[1]);
+			exit(EXIT_FAILURE);
+		}
+		close(pipefd[1]);
+
+		addenv("QUERY_STRING", req.getParams());
+		addenv("REQUEST_METHOD", req.getMethod());
+		addenv("SERVER_PROTOCOL", "HTTP/1.1");
+		addenv("CONTENT_TYPE", req.getHeader("content-type", ""));
+		addenv("CONTENT_LENGTH", req.getHeader("content-length", ""));
+		addenv("HTTP_ACCEPT", req.getHeader("accept", ""));
+		addenv("SERVER_NAME", req.getHeader("host", ""));
+		addenv("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
+		addenv("HTTP_ACCEPT_ENCODING", req.getHeader("accept-encoding", ""));
+		addenv("HTTP_ACCEPT_LANGUAGE", req.getHeader("accept-language", "en-us"));
+
+		// REMARQUE:
+		addenv("HTTP_COOKIE", req.getHeader("cookie", "")); // AJOUT DES COOKIES
+		addenv("SERVER_SOFTWARE", "Webserv/1.0.0");
+		addenv("HTTP_CONNECTION", req.getHeader("connection", "keep-alive"));
+		addenv("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
+		addenv("DOCUMENT_ROOT", "/home/michael/Documents/cursus/webserv/www");
+		addenv("REQUEST_URI", req.getTarget() + (req.getParams().size() ? "?" + req.getParams() : ""));
+
+		// REMARQUE: 
+		addenv("REDIRECT_STATUS", "1"); // NECESSAIRE POUR INDIQUER AU CGI QUE C'EST BIEN UN SERVEUR QUI l'EXECUTE
+		addenv("SCRIPT_FILENAME", script); // CHEMIN ABSOLU DU SCRIPT CIBLE
+		addenv("PATH_INFO", req.getTarget()); // TARGET > localhost:3000/sub/test.php -> sub/test.php
+		char** envp = put_to_env();
+
+		//std::vector<std::string> paths;
+		//const char* absPath = getAbsolutePathOfFile(passcgi.c_str());
+   		//if (absPath != NULL) 
+	 	//{
+			char* const argv[] = { const_cast<char*>(passcgi.c_str()), NULL };
+			if (execve(passcgi.c_str(), argv, envp) == -1) {
+				perror("execve");
+				std::cerr << "execve failed for: " << argv[0] << std::endl;
+				std::cerr << "Path might be incorrect or file might not have execute permissions." << std::endl;
+				std::cerr.flush();
+			}
+			exit(EXIT_FAILURE);
+		//}
+		//return (NULL);
+	}
+	else {
+		close(pipefd[1]);
+
+		char buffer[1024];
+		buffer[1023] = '\0';
+		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: %1\r\n";
+		ssize_t bytesRead;
+		while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
+			response.append(buffer, bytesRead);
+		}
+		close(pipefd[0]);
+
+		// REMARQUE: SET-UP LE CONTENT-LENGTH
+		if (response.find("\r\n\r\n") == string::npos)
+			response += "\r\n";
+		response = String::replace(response, "%1", String::tostr(response.substr(response.find("\r\n\r\n") + 4).size()));
+
+		// REMARQUE: IL EST PREFERABLE DE KILL LE CHILD PLUTOT QUE DE waitpid POUR EVITER UNE LATENCE.
+		// UNE FOIS QUE READ A FINIT, ON A PLUS BESOIN DE LUI QUOIQU'IL SOIT ENTRAIN DE FAIRE.
+		kill(pid, SIGKILL);
+
+		/*int status;
+		waitpid(pid, &status, 0); // Wait for child process to finish
+		if (!WIFEXITED(status) || WIFSIGNALED(status))
+			std::cerr << "Child killed by signal: " << WTERMSIG(status) << std::endl;
+		*/
+		return response;
+	}
 }
-
