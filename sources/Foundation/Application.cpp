@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 22:52:06 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/30 12:54:17 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,12 +118,6 @@ Application::handle(const int &fd)
 	
 	this->_chunked.erase(fd);
 
-	if ((status = req->getStatus()) != 200)
-	{
-		Response(fd).setStatus(status).addPacket(Template::error(req->getStatus())).send();
-		return (delete req, this->end(fd), (void) NULL);
-	}
-
 	for (size_t i = 0; i < this->_servers.size(); i++)
 	{
 		if ((server = this->_servers[i])->match(*req))
@@ -139,7 +133,7 @@ Application::handle(const int &fd)
 				{
 					if ((route = server->routes[j])->match(*req))
 					{
-						if ((status = route->check(*req)) != 200)
+						if ((status = req->getStatus()) != 200 || (status = route->check(*req)) != 200)
 						{
 							Response(fd).setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
 							goto next;
@@ -182,7 +176,14 @@ Application::handle(const int &fd)
 			}
 		}
 	}
-	Response(fd).setStatus(404).addPacket(Template::error(404)).send();
+	if ((status = req->getStatus()) != 200)
+	{
+		Response(fd).setStatus(status).addPacket(Template::error(req->getStatus())).send();
+		if (this->_chunked.find(fd) != this->_chunked.end())
+			this->_chunked.erase(fd);
+	}
+	else
+		Response(fd).setStatus(404).addPacket(Template::error(404)).send();
 	next: ;
 
 	// if (String::lowercase(req->getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only

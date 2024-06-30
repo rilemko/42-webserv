@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 12:31:17 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/30 12:54:25 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ std::string Gateway::cgirun(Request& req, std::string passcgi) {
 		close(pipefd[0]);
 
 		// REMARQUE: SET-UP LE CONTENT-LENGTH
-		response = String::replace(response, "%1", String::tostr(response.substr(response.find("\r\n\r\n") + 4).size() - 1));
+		response = String::replace(response, "%1", String::tostr(response.substr(response.find("\r\n\r\n") + 4).size()));
 
 		// REMARQUE: IL EST PREFERABLE DE KILL LE CHILD PLUTOT QUE DE waitpid POUR EVITER UNE LATENCE.
 		// UNE FOIS QUE READ A FINIT, ON A PLUS BESOIN DE LUI QUOIQU'IL SOIT ENTRAIN DE FAIRE.
