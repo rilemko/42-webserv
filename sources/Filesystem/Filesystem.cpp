@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/27 22:14:42 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/29 22:52:37 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,8 @@ Filesystem::recv(const int &fd)
 	return (packet);
 }
 
+#include <iostream>
+
 void
 Filesystem::send(const int &fd, const string &data)
 {
@@ -141,5 +143,6 @@ Filesystem::scandir(const string &path, const bool &hidden)
 				scan.push_back(target);
 		}
 	}
+	closedir(dir);
 	return (scan);
 }

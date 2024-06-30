@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/28 22:03:09 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/06/29 19:16:21 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,15 +130,13 @@ Server::match(Request &request) const
 Server&
 Server::operator=(const Server &rhs)
 {
-	if (this != &rhs) {
-		this->errors = rhs.errors;
-		this->listen = rhs.listen;
-		this->maxbdy = rhs.maxbdy;
-		this->routes = rhs.routes;
-		this->snames = rhs.snames;
-		this->socket = rhs.socket;
-		this->target = rhs.target;
-	}
+	this->errors = rhs.errors;
+	this->listen = rhs.listen;
+	this->maxbdy = rhs.maxbdy;
+	this->routes = rhs.routes;
+	this->snames = rhs.snames;
+	this->socket = rhs.socket;
+	this->target = rhs.target;
 	return (*this);
 }
 

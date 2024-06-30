@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 17:10:52 by muteza           ###   ########.fr       */
+/*   Updated: 2024/06/30 12:31:17 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,52 +93,69 @@ std::string Gateway::cgirun(Request& req, std::string passcgi) {
 		}
 		close(pipefd[1]);
 
-		addenv("QUERY_STRING", req.getTarget());
+		addenv("QUERY_STRING", req.getParams());
 		addenv("REQUEST_METHOD", req.getMethod());
 		addenv("SERVER_PROTOCOL", "HTTP/1.1");
-		addenv("CONTENT_TYPE", req.getHeader("content-type",""));
-		addenv("CONTENT_LENGTH", req.getHeader("content-length",""));
-		addenv("HTTP_ACCEPT", req.getHeader("accept",""));
-		addenv("SERVER_NAME", req.getHeader("host",""));
-		addenv("HTTP_USER_AGENT", req.getHeader("user-agent",""));
-		addenv("HTTP_ACCEPT_ENCODING", req.getHeader("accept-encoding",""));
-		addenv("HTTP_ACCEPT_LANGUAGE", req.getHeader("accept-language",""));
+		addenv("CONTENT_TYPE", req.getHeader("content-type", ""));
+		addenv("CONTENT_LENGTH", req.getHeader("content-length", ""));
+		addenv("HTTP_ACCEPT", req.getHeader("accept", ""));
+		addenv("SERVER_NAME", req.getHeader("host", ""));
+		addenv("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
+		addenv("HTTP_ACCEPT_ENCODING", req.getHeader("accept-encoding", ""));
+		addenv("HTTP_ACCEPT_LANGUAGE", req.getHeader("accept-language", "en-us"));
+
+		// REMARQUE:
+		addenv("HTTP_COOKIE", req.getHeader("cookie", "")); // AJOUT DES COOKIES
+		addenv("SERVER_SOFTWARE", "Webserv/1.0.0");
+		addenv("HTTP_CONNECTION", req.getHeader("connection", "keep-alive"));
+		addenv("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
+		addenv("DOCUMENT_ROOT", "/home/michael/Documents/cursus/webserv/www");
+
+		// REMARQUE: 
+		addenv("REDIRECT_STATUS", "1"); // NECESSAIRE POUR INDIQUER AU CGI QUE C'EST BIEN UN SERVEUR QUI l'EXECUTE
+		addenv("SCRIPT_FILENAME", "/home/michael/Documents/cursus/webserv/www/test.php"); // CHEMIN ABSOLU DU SCRIPT CIBLE
+		addenv("PATH_INFO", req.getTarget()); // TARGET > localhost:3000/sub/test.php -> sub/test.php
 		char** envp = put_to_env();
 
-		std::vector<std::string> paths;
-		const char* absPath = getAbsolutePathOfFile(passcgi.c_str());
-   		if (absPath != NULL) 
-	 	{
-			char* const argv[] = { const_cast<char*>(absPath), NULL };
-			if (execve(absPath, argv, envp) == -1) {
+		//std::vector<std::string> paths;
+		//const char* absPath = getAbsolutePathOfFile(passcgi.c_str());
+   		//if (absPath != NULL) 
+	 	//{
+			char* const argv[] = { const_cast<char*>(passcgi.c_str()), NULL };
+			if (execve(passcgi.c_str(), argv, envp) == -1) {
 				perror("execve");
 				std::cerr << "execve failed for: " << argv[0] << std::endl;
 				std::cerr << "Path might be incorrect or file might not have execute permissions." << std::endl;
 				std::cerr.flush();
 			}
-				exit(EXIT_FAILURE);
-		}
-		return (NULL);
+			exit(EXIT_FAILURE);
+		//}
+		//return (NULL);
 	}
 	else {
 		close(pipefd[1]);
 
 		char buffer[1024];
 		buffer[1023] = '\0';
-		std::string response = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n";
+		std::string response = "HTTP/1.1 200 OK\r\nContent-Length: %1\r\n";
 		ssize_t bytesRead;
 		while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
 			response.append(buffer, bytesRead);
 		}
 		close(pipefd[0]);
 
-		int status;
+		// REMARQUE: SET-UP LE CONTENT-LENGTH
+		response = String::replace(response, "%1", String::tostr(response.substr(response.find("\r\n\r\n") + 4).size() - 1));
+
+		// REMARQUE: IL EST PREFERABLE DE KILL LE CHILD PLUTOT QUE DE waitpid POUR EVITER UNE LATENCE.
+		// UNE FOIS QUE READ A FINIT, ON A PLUS BESOIN DE LUI QUOIQU'IL SOIT ENTRAIN DE FAIRE.
+		kill(pid, SIGKILL);
+
+		/*int status;
 		waitpid(pid, &status, 0); // Wait for child process to finish
-		if (WIFEXITED(status)) {
-			return response;
-		} else if (WIFSIGNALED(status)) {
+		if (!WIFEXITED(status) || WIFSIGNALED(status))
 			std::cerr << "Child killed by signal: " << WTERMSIG(status) << std::endl;
-		}
+		*/
 		return response;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/28 22:30:38 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/06/29 22:52:06 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,13 +161,13 @@ Application::handle(const int &fd)
 								Response(fd).send(Gateway().cgirun(*req, route->passcgi));
 							}
 							else if (Filesystem::isReg(route->rooting + req->getTarget()))
-								Response(fd).setStatus(200).addPacket(Filesystem::get(route->rooting + req->getTarget())).send();
+								Response(fd).addPacket(Filesystem::get(route->rooting + req->getTarget())).send();
 							else if (Filesystem::isDir(route->rooting + req->getTarget()))
 							{
 								if (route->dindex.size() && Filesystem::isReg(route->rooting + req->getTarget() + route->dindex))
-									Response(fd).setStatus(200).addPacket(Filesystem::get(route->rooting + req->getTarget() + route->dindex)).send();
+									Response(fd).addPacket(Filesystem::get(route->rooting + req->getTarget() + route->dindex)).send();
 								else if (route->dirlst)
-									Response(fd).setStatus(200).addPacket(Template::index(route->rooting + req->getTarget())).send();
+									Response(fd).addPacket(Template::index(route->rooting + req->getTarget())).send();
 								else
 									Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							}
