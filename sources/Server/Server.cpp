@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/01 17:01:31 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:29:44 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ Server::addDirective(const int lineNumber, const string &directive)
 	value = String::strim(value, " \f\r\t\v");
 
 	if (key == "errors_page") {
-		handleErrorsPage(value);
+		handleErrorsPage(lineNumber, value);
 	} else if (key == "listen") {
 		handleListen(lineNumber, value);
 	} else if (key == "max_body_size") {
@@ -141,7 +141,7 @@ Server::operator=(const Server &rhs)
 }
 
 void
-Server::handleErrorsPage(const string &value)
+Server::handleErrorsPage(const int lineNumber, const string &value)
 {
 	stringstream 	ss(value);
 	vector<int> 	codes;
@@ -153,7 +153,7 @@ Server::handleErrorsPage(const string &value)
 		tokens.push_back(token);
 	}
 	if (tokens.size() < 2) {
-		Logger::warn("Invalid error page parameter. Skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error page parameter. Skipping...");
 		return;
 	}
 	page = tokens.back();	// last one contains the page
@@ -161,14 +161,14 @@ Server::handleErrorsPage(const string &value)
 	for (size_t i = 0; i < tokens.size(); ++i) {
 		int code = ::atoi(tokens[i].c_str());
 		if (code < 100 || code > 599) {
-			Logger::warn("Invalid error code. Skipping...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error code. Skipping...");
 			continue;
 		}
 		if (this->errors.find(code) == this->errors.end()) {
 			this->errors[code] = page;
 		}
 		else {
-			Logger::warn("Error code already in database. Skipping...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code already in database. Skipping...");
 		}
 	}
 }
@@ -202,7 +202,7 @@ Server::handleListen(const int lineNumber, const string &value)
 	}
 	string extraParam;
 	while (ss >> extraParam) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + "Skipping extra parameter: " + extraParam);
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Skipping extra parameter: " + extraParam);
 	}
 }
 
@@ -252,7 +252,7 @@ Server::handleServerName(const int lineNumber, const string &value)
 		if (name == "*" && this->snames.size() == 1) {
 			this->snames.push_back(name);
 		}
-		else if (find(snames.begin(), snames.end(), name) == snames.end()) {
+		else if (::find(snames.begin(), snames.end(), name) == snames.end()) {
 			this->snames.push_back(name);
 		}
 		else {
