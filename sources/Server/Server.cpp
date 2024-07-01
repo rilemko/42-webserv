@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/01 22:41:15 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/01 23:38:08 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 	if (!ss.eof()) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". Too many arguments, first value used to setup maxbdy.");
 	}
-	if (maxbdyValue = 0) {
+	if (maxbdyValue == 0) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". maxbdy value can't be zero. Skipping...");
 	}
 	else
