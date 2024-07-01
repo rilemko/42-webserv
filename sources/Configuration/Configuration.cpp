@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 18:11:02 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/01 23:36:17 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				{
 					// Location directive.
 					Logger::dump("Add route directive: " + line);
-					currentRoute->addDirective(line);
+					currentRoute->addDirective(y, line);
 				}
 			}
 			else if (!line.size()) {

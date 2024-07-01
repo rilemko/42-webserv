@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/28 10:08:24 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/01 23:39:19 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ Route::~Route()
 }
 
 void
-Route::addDirective(const string &directive)
+Route::addDirective(const int lineNumber, const string &directive)
 {
 	string key, value;
 	stringstream ss(directive);
@@ -51,9 +51,9 @@ Route::addDirective(const string &directive)
 	value = String::strim(value, " \f\r\t\v");
 
 	if (key == "cgi_pass") {
-		handleCgiPass(value);
+		handleCgiPass(lineNumber, value);
 	} else if (key == "listing") {
-		handleListing(value);
+		handleListing(lineNumber, value);
 	} else if (key == "index") {
 		handleIndex(value);
 	} else if (key == "methods") {
@@ -117,15 +117,26 @@ Route::operator=(const Route &rhs)
 }
 
 void
-Route::handleCgiPass(const string &value)
+Route::handleCgiPass(const int lineNumber, const string &value)
 {
+	if (!this->passcgi.empty()) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". CGI pass already in database. Replacing old value...");
+	}
 	this->passcgi = value;
 }
 
 void
-Route::handleListing(const string &value)
+Route::handleListing(const int lineNumber, const string &value)
 {
-	this->dirlst = (value == "on");
+	if (value == "on") {
+		this->dirlst = true;
+	}
+	else if (value == "off") {
+		this->dirlst = false;
+	}
+	else {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid parameter. Skipping ...");
+	}
 }
 
 void
