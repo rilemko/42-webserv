@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 17:11:00 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/01 16:56:36 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <cstdlib> // for atoi
+#include <algorithm> // for find
 
 using namespace std;
 
@@ -51,8 +52,7 @@ class Server
 
 	private   :
 		void						handleErrorsPage(const string &value);
-		void						handleListen(const string &value);
+		void						handleListen(const int lineNumber, const string &value);
 		void						handleMaxBodySize(const int lineNumber, const string &value);
-		void						handleServerName(const string &value);
-
+		void						handleServerName(const int lineNumber, const string &value);
 };

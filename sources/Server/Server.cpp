@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 22:30:55 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/01 17:01:31 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,11 +64,11 @@ Server::addDirective(const int lineNumber, const string &directive)
 	if (key == "errors_page") {
 		handleErrorsPage(value);
 	} else if (key == "listen") {
-		handleListen(value);
+		handleListen(lineNumber, value);
 	} else if (key == "max_body_size") {
 		handleMaxBodySize(lineNumber, value);
 	} else if (key == "server_name") {
-		handleServerName(value);
+		handleServerName(lineNumber, value);
 	} else {
 		Logger::warn("Unknown server directive : " + directive);
 	}
@@ -174,7 +174,7 @@ Server::handleErrorsPage(const string &value)
 }
 
 void
-Server::handleListen(const string &value)
+Server::handleListen(const int lineNumber, const string &value)
 {
 	stringstream ss(value);
 	string firstValue;
@@ -202,7 +202,7 @@ Server::handleListen(const string &value)
 	}
 	string extraParam;
 	while (ss >> extraParam) {
-		Logger::warn("Skipping extra parameter: " + extraParam);
+		Logger::warn("Line: " + String::tostr(lineNumber) + "Skipping extra parameter: " + extraParam);
 	}
 }
 
@@ -240,17 +240,23 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 }
 
 void
-Server::handleServerName(const string &value)
+Server::handleServerName(const int lineNumber, const string &value)
 {
-	if (value.empty())
-	{
-		return;
+	if (this->snames.size() == 1 && this->snames[0] == "*" && value != "*") {
+		this->snames.clear();
 	}
-	this->snames.clear();
 	stringstream ss(value);
 	string name;
 	while (ss >> name)
 	{
-		this->snames.push_back(name);
+		if (name == "*" && this->snames.size() == 1) {
+			this->snames.push_back(name);
+		}
+		else if (find(snames.begin(), snames.end(), name) == snames.end()) {
+			this->snames.push_back(name);
+		}
+		else {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Duplicate server name detected: " + name + ". Skipping...");
+		}
 	}
 }
