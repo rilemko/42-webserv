@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 14:49:49 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:23:10 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@ Server::Server() :
 	this->listen.first = "0.0.0.0";
 	this->listen.second = "80";
 	this->snames.push_back("*");
+	this->isDuplicate["errors"] = false;
+	this->isDuplicate["listen"] = false;
+	this->isDuplicate["maxbdy"] = false;
+	this->isDuplicate["snames"] = false;
 }
 
 Server::Server(const Server &src)
@@ -70,7 +74,7 @@ Server::addDirective(const int lineNumber, const string &directive)
 	} else if (key == "server_name") {
 		handleServerName(lineNumber, value);
 	} else {
-		Logger::warn("Unknown server directive : " + directive);
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Unknown server directive : " + directive);
 	}
 }
 
@@ -137,12 +141,17 @@ Server::operator=(const Server &rhs)
 	this->snames = rhs.snames;
 	this->socket = rhs.socket;
 	this->target = rhs.target;
+	this->isDuplicate = rhs.isDuplicate;
 	return (*this);
 }
 
 void
 Server::handleErrorsPage(const int lineNumber, const string &value)
 {
+	if (isDuplicate["errors"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Errors page directive already defined. New value(s) may be added ...");
+	}
+	isDuplicate["errors"] = true;
 	stringstream 	ss(value);
 	vector<int> 	codes;
 	string			token;
@@ -161,11 +170,11 @@ Server::handleErrorsPage(const int lineNumber, const string &value)
 	for (size_t i = 0; i < tokens.size(); ++i) {
 		int code = ::atoi(tokens[i].c_str());
 		if (code < 100 || code > 599) {
-			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error code. Skipping ...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error code: " + String::tostr(code) + ". Skipping ...");
 			continue;
 		}
 		if (this->errors.find(code) != this->errors.end()) {
-			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code already set. Replacing old value ...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code " + String::tostr(code) + " already set. Replacing old value ...");
 		}
 		this->errors[code] = page;
 	}
@@ -174,9 +183,12 @@ Server::handleErrorsPage(const int lineNumber, const string &value)
 void
 Server::handleListen(const int lineNumber, const string &value)
 {
+	if (isDuplicate["listen"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Listen directive already defined. Replacing old value ...");
+	}
+	isDuplicate["listen"] = true;
 	stringstream ss(value);
 	string firstValue;
-
 	ss >> firstValue;
 	size_t pos1 = firstValue.find(':');
 	if (pos1 != string::npos)
@@ -207,6 +219,9 @@ Server::handleListen(const int lineNumber, const string &value)
 void
 Server::handleMaxBodySize(const int lineNumber, const string &value)
 {
+	if (isDuplicate["maxbdy"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Max body size directive already defined. Replacing old value ...");
+	}
 	if (value.empty())
 	{
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". No value set for maxbdy. Skipping ...");
@@ -240,7 +255,10 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 void
 Server::handleServerName(const int lineNumber, const string &value)
 {
-	if (this->snames.size() == 1 && this->snames[0] == "*" && value != "*") {
+	if (isDuplicate["snames"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Server name directive already defined. Adding new value(s) ...");
+	}
+	if (!isDuplicate["snames"]) {
 		this->snames.clear();
 	}
 	stringstream ss(value);

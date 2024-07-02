@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/01 17:17:21 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:32:35 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,9 @@ class Server
 		vector<string>				snames;
 		int							socket;
 		pair<in_addr_t,in_port_t>	target;
+
+	private :
+		map<string, bool>			isDuplicate;
 
 	public   :
 									Server();
