@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/01 23:32:49 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 06:38:31 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class Route
 	private   :
 		void handleCgiPass(const int lineNumber, const string &value);
 		void handleListing(const int lineNumber, const string &value);
-		void handleIndex(const string &value);
+		void handleIndex(const int lineNumber, const string &value);
 		void handleMethods(const string &value);
 		void handleRewrite(const string &value);
 		void handleRoot(const string &value);

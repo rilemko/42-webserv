@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/01 23:39:19 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 06:40:23 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Route::Route() :
 	dirlst(true),
-	dindex("index.html"),
+	dindex("/index.html"),
 	rooting("www")
 {
 	this->method.push_back("GET");
@@ -55,7 +55,7 @@ Route::addDirective(const int lineNumber, const string &directive)
 	} else if (key == "listing") {
 		handleListing(lineNumber, value);
 	} else if (key == "index") {
-		handleIndex(value);
+		handleIndex(lineNumber, value);
 	} else if (key == "methods") {
 		handleMethods(value);
 	} else if (key == "rewrite") {
@@ -120,7 +120,7 @@ void
 Route::handleCgiPass(const int lineNumber, const string &value)
 {
 	if (!this->passcgi.empty()) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". CGI pass already in database. Replacing old value...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". CGI pass already setup. Replacing old value...");
 	}
 	this->passcgi = value;
 }
@@ -140,8 +140,11 @@ Route::handleListing(const int lineNumber, const string &value)
 }
 
 void
-Route::handleIndex(const string &value)
+Route::handleIndex(const int lineNumber, const string &value)
 {
+	if (value != "/index.html") {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Index already setup. Replacing old value ...");
+	}
 	if (value[0] == '/') {
 		this->dindex = value;
 	}
