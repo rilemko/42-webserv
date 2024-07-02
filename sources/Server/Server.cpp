@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 06:37:51 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 12:12:09 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ Server::handleErrorsPage(const int lineNumber, const string &value)
 			continue;
 		}
 		if (this->errors.find(code) != this->errors.end()) {
-			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code already setup. Replacing old value...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code already set. Replacing old value...");
 		}
 		this->errors[code] = page;
 	}
@@ -226,7 +226,7 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 		return;
 	}
 	if (!ss.eof()) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". Too many arguments, first value used to setup maxbdy.");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Too many arguments, first value used to set maxbdy.");
 	}
 	if (maxbdyValue == 0) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". maxbdy value can't be zero. Skipping...");
