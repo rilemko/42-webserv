@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 15:11:25 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 18:09:26 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,13 @@ Route::Route() :
 	this->method.push_back("OPTIONS");
 	this->method.push_back("TRACE");
 	this->method.push_back("PATCH");
-	isDuplicate["cgi_pass"] = false;
-    isDuplicate["listing"] = false;
-    isDuplicate["index"] = false;
-    isDuplicate["methods"] = false;
-    isDuplicate["rewrite"] = false;
-    isDuplicate["root"] = false;
-    isDuplicate["uploadTo"] = false;
+	this->isDuplicate["cgi_pass"] = false;
+	this->isDuplicate["listing"] = false;
+	this->isDuplicate["index"] = false;
+	this->isDuplicate["methods"] = false;
+	this->isDuplicate["rewrite"] = false;
+	this->isDuplicate["root"] = false;
+	this->isDuplicate["uploadTo"] = false;
 }
 
 Route::Route(const Route &src)
