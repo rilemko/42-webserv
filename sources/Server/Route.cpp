@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 06:40:23 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:11:25 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,13 @@ Route::Route() :
 	this->method.push_back("OPTIONS");
 	this->method.push_back("TRACE");
 	this->method.push_back("PATCH");
+	isDuplicate["cgi_pass"] = false;
+    isDuplicate["listing"] = false;
+    isDuplicate["index"] = false;
+    isDuplicate["methods"] = false;
+    isDuplicate["rewrite"] = false;
+    isDuplicate["root"] = false;
+    isDuplicate["uploadTo"] = false;
 }
 
 Route::Route(const Route &src)
@@ -45,7 +52,7 @@ Route::addDirective(const int lineNumber, const string &directive)
 
 	ss >> key;
 	if (!getline(ss, value)) {
-		Logger::warn("Failed to read route directive. Skipping...");
+		Logger::warn("Failed to read route directive. Skipping ...");
 		return;
 	}
 	value = String::strim(value, " \f\r\t\v");
@@ -57,13 +64,13 @@ Route::addDirective(const int lineNumber, const string &directive)
 	} else if (key == "index") {
 		handleIndex(lineNumber, value);
 	} else if (key == "methods") {
-		handleMethods(value);
+		handleMethods(lineNumber, value);
 	} else if (key == "rewrite") {
-		handleRewrite(value);
+		handleRewrite(lineNumber, value);
 	} else if (key == "root") {
-		handleRoot(value);
+		handleRoot(lineNumber, value);
 	} else if (key == "upload_to") {
-		handleUploadTo(value);
+		handleUploadTo(lineNumber, value);
 	} else {
 		Logger::warn("Unknown route directive ; " + directive);
 	}
@@ -113,14 +120,18 @@ Route::operator=(const Route &rhs)
 	this->rooting = rhs.rooting;
 	this->target = rhs.target;
 	this->upload = rhs.upload;
+	this->isDuplicate = rhs.isDuplicate;
 	return (*this);
 }
 
 void
 Route::handleCgiPass(const int lineNumber, const string &value)
 {
-	if (!this->passcgi.empty()) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". CGI pass already setup. Replacing old value...");
+	if (isDuplicate["cgi_pass"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". CGI pass directive already . Replacing old value ...");
+	}
+	else {
+		isDuplicate["cgi_pass"] = true;
 	}
 	this->passcgi = value;
 }
@@ -128,22 +139,30 @@ Route::handleCgiPass(const int lineNumber, const string &value)
 void
 Route::handleListing(const int lineNumber, const string &value)
 {
-	if (value == "on") {
-		this->dirlst = true;
-	}
-	else if (value == "off") {
-		this->dirlst = false;
-	}
-	else {
-			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid parameter. Skipping ...");
+	if (value == "on" || value == "off") {
+		if (isDuplicate["listing"]) {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Listing directive already set. Replacing old value ...");
+		} else {
+			isDuplicate["listing"] = true;
+		}
+		this->dirlst = (value == "on");
+	} else {
+		if (isDuplicate["listing"]) {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid listing parameter. Skipping duplicate directive ...");
+		} else {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid listing parameter. Skipping ...");
+			isDuplicate["listing"] = true;
+		}
 	}
 }
 
 void
 Route::handleIndex(const int lineNumber, const string &value)
 {
-	if (value != "/index.html") {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". Index already setup. Replacing old value ...");
+	if (isDuplicate["index"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Index directive already set. Replacing old value ...");
+	} else {
+		isDuplicate["index"] = true;
 	}
 	if (value[0] == '/') {
 		this->dindex = value;
@@ -154,15 +173,18 @@ Route::handleIndex(const int lineNumber, const string &value)
 }
 
 void
-Route::handleMethods(const string &value)
+Route::handleMethods(const int lineNumber, const string &value)
 {
-	if (value == "*" || value.empty())
-	{
-		return;
+	if (isDuplicate["methods"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Methods directive already set. Adding new value(s) ...");
+	} else {
+		isDuplicate["methods"] = true;
 	}
 	stringstream ss(value);
 	string method;
-	this->method.clear();
+	if (!isDuplicate["methods"]) {
+		this->method.clear();
+	}
 	while (ss >> method)
 	{
 		this->method.push_back(method);
@@ -170,26 +192,47 @@ Route::handleMethods(const string &value)
 }
 
 void
-Route::handleRewrite(const string &value)
+Route::handleRewrite(const int lineNumber, const string &value)
 {
 	stringstream ss(value);
 	size_t code;
 	string url;
-	if (!(ss >> code >> url)) {
-		Logger::warn("Rewrite directive invalid. Skipping...");
-		return;
+	bool isValid = (ss >> code >> url) && (ss.eof());
+	if (isValid) {
+		if (isDuplicate["rewrite"]) {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Rewrite directive already set. Replacing old value ...");
+		} else {
+			isDuplicate["rewrite"] = true;
+		}
+		this->rewrite = ::make_pair(code, url);
+	} else {
+		if (isDuplicate["rewrite"]) {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid rewrite directive. Skipping duplicate ...");
+		} else {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid rewrite directive. Skipping ...");
+			isDuplicate["rewrite"] = true;
+		}
 	}
-	this->rewrite = ::make_pair(code, url);
 }
 
 void
-Route::handleRoot(const string &value)
+Route::handleRoot(const int lineNumber, const string &value)
 {
+	if (isDuplicate["root"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Root directive already set. Replacing old value...");
+	} else {
+		isDuplicate["root"] = true;
+	}
 	this->rooting = value;
 }
 
 void
-Route::handleUploadTo(const string &value)
+Route::handleUploadTo(const int lineNumber, const string &value)
 {
+	if (isDuplicate["uploadTo"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Upload_to directive already set. Replacing old value...");
+	} else {
+		isDuplicate["uploadTo"] = true;
+	}
 	this->upload = value;
 }
