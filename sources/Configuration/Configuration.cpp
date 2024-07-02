@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/01 23:36:17 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 14:48:09 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				// skip empty line
 			}
 			else {
-				Logger::warn("Line: " + String::tostr(y) + ". Unrecognized directive: " + line + ". Skipping...");
+				Logger::warn("Line: " + String::tostr(y) + ". Unrecognized directive: " + line + ". Skipping ...");
 			}
 		}
 		stream.close();
@@ -134,7 +134,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 
 		epoll_event	e = {EPOLLIN, {0}};
 
-		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing...
+		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing ...
 		{
 			try
 			{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Application.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 15:11:51 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/02 14:48:17 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ Application::handle(const int &fd)
 	size_t		status;
 
 	req->recv();
-	
+
 	if (req->getHeader("transfer-encoding", "") == "chunked" && this->_chunked.find(fd) == this->_chunked.end())
 	{
 		this->_chunked[fd] = req;
@@ -120,7 +120,7 @@ Application::handle(const int &fd)
 
 	if ((status = req->getStatus()) == 1)
 		return ;
-	
+
 	this->_chunked.erase(fd);
 
 	for (size_t i = 0; i < this->_servers.size(); i++)
@@ -197,7 +197,7 @@ Application::handle(const int &fd)
 
 	// if (String::lowercase(req->getHeader("connection", "keep-alive")) != "close") // <= Use this for "keep-alive" by default with HTTP/1.1, commented for testing purpose only
 	if (String::lowercase(req->getHeader("connection", "")) == "keep-alive") // <= Used for testing purpose only, use the above one in production
-		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp...
+		this->_clients[fd] = ::time(0); // Create or update the keep-alive fd timestamp ...
 	else
 		::close(fd); // Or close the fd
 	delete req;

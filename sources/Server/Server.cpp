@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 12:12:09 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 14:49:49 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ Server::addDirective(const int lineNumber, const string &directive)
 
 	ss >> key;
 	if (!getline(ss, value)) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to read server directive. skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to read server directive. skipping ...");
 		return;
 	}
 	value = String::strim(value, " \f\r\t\v");
@@ -153,7 +153,7 @@ Server::handleErrorsPage(const int lineNumber, const string &value)
 		tokens.push_back(token);
 	}
 	if (tokens.size() < 2) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error page parameter. Skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error page parameter. Skipping ...");
 		return;
 	}
 	page = tokens.back();	// last one contains the page
@@ -161,11 +161,11 @@ Server::handleErrorsPage(const int lineNumber, const string &value)
 	for (size_t i = 0; i < tokens.size(); ++i) {
 		int code = ::atoi(tokens[i].c_str());
 		if (code < 100 || code > 599) {
-			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error code. Skipping...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error code. Skipping ...");
 			continue;
 		}
 		if (this->errors.find(code) != this->errors.end()) {
-			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code already set. Replacing old value...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code already set. Replacing old value ...");
 		}
 		this->errors[code] = page;
 	}
@@ -209,12 +209,12 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 {
 	if (value.empty())
 	{
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". No value set for maxbdy. Skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". No value set for maxbdy. Skipping ...");
 		return;
 	}
 	if (value[0] == '-')
 	{
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". Negative value is not possible for maxbdy. Skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Negative value is not possible for maxbdy. Skipping ...");
 		return;
 	}
 	stringstream ss(value);
@@ -222,14 +222,14 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 	ss >> maxbdyValue;
 	if (ss.fail())
 	{
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to convert maxbdy value. Skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to convert maxbdy value. Skipping ...");
 		return;
 	}
 	if (!ss.eof()) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". Too many arguments, first value used to set maxbdy.");
 	}
 	if (maxbdyValue == 0) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". maxbdy value can't be zero. Skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". maxbdy value can't be zero. Skipping ...");
 	}
 	else
 	{
@@ -254,7 +254,7 @@ Server::handleServerName(const int lineNumber, const string &value)
 			this->snames.push_back(name);
 		}
 		else {
-			Logger::warn("Line: " + String::tostr(lineNumber) + ". Duplicate server name detected: " + name + ". Skipping...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Duplicate server name detected: " + name + ". Skipping ...");
 		}
 	}
 }
