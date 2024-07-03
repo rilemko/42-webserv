@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 18:23:10 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:08:23 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,14 +134,16 @@ Server::match(Request &request) const
 Server&
 Server::operator=(const Server &rhs)
 {
-	this->errors = rhs.errors;
-	this->listen = rhs.listen;
-	this->maxbdy = rhs.maxbdy;
-	this->routes = rhs.routes;
-	this->snames = rhs.snames;
-	this->socket = rhs.socket;
-	this->target = rhs.target;
-	this->isDuplicate = rhs.isDuplicate;
+	if (this != &rhs) {
+		this->errors = rhs.errors;
+		this->listen = rhs.listen;
+		this->maxbdy = rhs.maxbdy;
+		this->routes = rhs.routes;
+		this->snames = rhs.snames;
+		this->socket = rhs.socket;
+		this->target = rhs.target;
+		this->isDuplicate = rhs.isDuplicate;
+	}
 	return (*this);
 }
 
@@ -193,10 +195,10 @@ Server::handleListen(const int lineNumber, const string &value)
 	size_t pos1 = firstValue.find(':');
 	if (pos1 != string::npos)
 	{
-		if (!value.substr(0, pos1).empty()) {
+		if (!firstValue.substr(0, pos1).empty()) {
 			this->listen.first = firstValue.substr(0, pos1);
 		}
-		if (!value.substr(pos1 + 1).empty()) {
+		if (!firstValue.substr(pos1 + 1).empty()) {
 			this->listen.second = firstValue.substr(pos1 + 1);
 		}
 	}
@@ -252,6 +254,16 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 	}
 }
 
+bool
+Server::contains(const vector<string>& vec, const string& value) {
+	for (size_t i = 0; i < vec.size(); ++i) {
+		if (vec[i] == value) {
+			return (true);
+		}
+	}
+	return (false);
+}
+
 void
 Server::handleServerName(const int lineNumber, const string &value)
 {
@@ -268,7 +280,7 @@ Server::handleServerName(const int lineNumber, const string &value)
 		if (name == "*" && this->snames.size() == 1) {
 			this->snames.push_back(name);
 		}
-		else if (::find(snames.begin(), snames.end(), name) == snames.end()) {
+		else if (!contains(snames,name)) {
 			this->snames.push_back(name);
 		}
 		else {

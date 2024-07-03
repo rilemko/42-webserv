@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 15:32:35 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:06:15 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include <map>
 #include <string>
 #include <cstdlib> // for atoi
-#include <algorithm> // for find
 
 using namespace std;
 
@@ -54,6 +53,7 @@ class Server
 		Server&						operator=(const Server &rhs);
 
 	private   :
+		bool						contains(const vector<string>& vec, const string& value);
 		void						handleErrorsPage(const int lineNumber, const string &value);
 		void						handleListen(const int lineNumber, const string &value);
 		void						handleMaxBodySize(const int lineNumber, const string &value);
