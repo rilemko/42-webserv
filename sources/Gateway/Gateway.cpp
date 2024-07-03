@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 15:17:57 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/03 17:59:05 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,14 @@ const char *Gateway::getAbsolutePathOfFile(const char *fileName) {
 	return NULL;
 }
 
+std::string Gateway::extractPort(const std::string& address) {
+	size_t colonPos = address.find(':');
+	if (colonPos == std::string::npos) {
+		return "";
+	}
+	return address.substr(colonPos + 1);
+}
+
 std::string Gateway::cgirun(Request& req, const string &passcgi, const string &script)
 {
 	int pipefd[2];
@@ -86,20 +94,33 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 
 	if (pid == 0) {
 		close(pipefd[0]);
-		if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1) 
+		{
 			perror("dup2");
 			close(pipefd[1]);
 			exit(EXIT_FAILURE);
 		}
 		close(pipefd[1]);
+		// if (strcmp(req.getMethod().c_str(), "GET") == 0)
+		// {
+		// 	if (dup2(pipefd[0], STDIN_FILENO) == -1) 
+		// 	{
+		// 		perror("dup2");
+		// 		close(pipefd[0]);
+		// 		exit(EXIT_FAILURE);
+		// 	}
+		// 	std::cout << "dwadawo" << std::endl;
+		// 	std::cerr << "dwdwadwa" << std::endl;
+		// 	// std::cout << req.getPacket() << std::endl;
+		// }
 
 		addenv("QUERY_STRING", req.getParams());
 		addenv("REQUEST_METHOD", req.getMethod());
 		addenv("SERVER_PROTOCOL", "HTTP/1.1");
 		addenv("CONTENT_TYPE", req.getHeader("content-type", ""));
-		addenv("CONTENT_LENGTH", req.getHeader("content-length", ""));
+		addenv("SERVER_PORT", extractPort(req.getHeader("host", "")));
 		addenv("HTTP_ACCEPT", req.getHeader("accept", ""));
-		addenv("SERVER_NAME", req.getHeader("host", ""));
+		addenv("SERVER_NAME", req.getHeader("host", "localhost"));
 		addenv("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
 		addenv("HTTP_ACCEPT_ENCODING", req.getHeader("accept-encoding", ""));
 		addenv("HTTP_ACCEPT_LANGUAGE", req.getHeader("accept-language", "en-us"));
@@ -116,12 +137,9 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 		addenv("REDIRECT_STATUS", "1"); // NECESSAIRE POUR INDIQUER AU CGI QUE C'EST BIEN UN SERVEUR QUI l'EXECUTE
 		addenv("SCRIPT_FILENAME", script); // CHEMIN ABSOLU DU SCRIPT CIBLE
 		addenv("PATH_INFO", req.getTarget()); // TARGET > localhost:3000/sub/test.php -> sub/test.php
+		
+		addenv("CONTENT_LENGTH", req.getHeader("content-length", ""));
 		char** envp = put_to_env();
-
-		//std::vector<std::string> paths;
-		//const char* absPath = getAbsolutePathOfFile(passcgi.c_str());
-   		//if (absPath != NULL) 
-	 	//{
 			char* const argv[] = { const_cast<char*>(passcgi.c_str()), NULL };
 			if (execve(passcgi.c_str(), argv, envp) == -1) {
 				perror("execve");
@@ -130,8 +148,6 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 				std::cerr.flush();
 			}
 			exit(EXIT_FAILURE);
-		//}
-		//return (NULL);
 	}
 	else {
 		close(pipefd[1]);
@@ -149,16 +165,7 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 		if (response.find("\r\n\r\n") == string::npos)
 			response += "\r\n";
 		response = String::replace(response, "%1", String::tostr(response.substr(response.find("\r\n\r\n") + 4).size()));
-
-		// REMARQUE: IL EST PREFERABLE DE KILL LE CHILD PLUTOT QUE DE waitpid POUR EVITER UNE LATENCE.
-		// UNE FOIS QUE READ A FINIT, ON A PLUS BESOIN DE LUI QUOIQU'IL SOIT ENTRAIN DE FAIRE.
 		kill(pid, SIGKILL);
-
-		/*int status;
-		waitpid(pid, &status, 0); // Wait for child process to finish
-		if (!WIFEXITED(status) || WIFSIGNALED(status))
-			std::cerr << "Child killed by signal: " << WTERMSIG(status) << std::endl;
-		*/
 		return response;
 	}
 }

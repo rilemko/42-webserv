@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:09 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 14:41:14 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/02 17:22:59 by muteza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ class Gateway
 		~Gateway();
 		Gateway&	operator=(const Gateway &rhs);
 
-		
+
+		std::string extractPort(const std::string& address);		
 		const char *getAbsolutePathOfFile(const char *fileName);
 		void	 addenv(const std::string& key, const std::string& value);
 		char	**put_to_env();
