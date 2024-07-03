@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 12:46:18 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/02 15:09:53 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,8 +111,6 @@ Filesystem::recv(const int &fd)
 	}
 	return (packet);
 }
-
-#include <iostream>
 
 void
 Filesystem::send(const int &fd, const string &data)

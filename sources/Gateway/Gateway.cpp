@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 15:17:57 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/02 22:19:37 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,6 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 		addenv("HTTP_COOKIE", req.getHeader("cookie", "")); // AJOUT DES COOKIES
 		addenv("SERVER_SOFTWARE", "Webserv/1.0.0");
 		addenv("HTTP_CONNECTION", req.getHeader("connection", "keep-alive"));
-		addenv("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
 		addenv("DOCUMENT_ROOT", "/home/michael/Documents/cursus/webserv/www");
 		addenv("REQUEST_URI", req.getTarget() + (req.getParams().size() ? "?" + req.getParams() : ""));
 
@@ -122,7 +121,7 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 		//const char* absPath = getAbsolutePathOfFile(passcgi.c_str());
    		//if (absPath != NULL) 
 	 	//{
-			char* const argv[] = { const_cast<char*>(passcgi.c_str()), NULL };
+			char *argv[] = { const_cast<char*>(passcgi.c_str()), NULL };
 			if (execve(passcgi.c_str(), argv, envp) == -1) {
 				perror("execve");
 				std::cerr << "execve failed for: " << argv[0] << std::endl;
@@ -135,6 +134,7 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 	}
 	else {
 		close(pipefd[1]);
+
 
 		char buffer[1024];
 		buffer[1023] = '\0';
@@ -149,7 +149,6 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 		if (response.find("\r\n\r\n") == string::npos)
 			response += "\r\n";
 		response = String::replace(response, "%1", String::tostr(response.substr(response.find("\r\n\r\n") + 4).size()));
-
 		// REMARQUE: IL EST PREFERABLE DE KILL LE CHILD PLUTOT QUE DE waitpid POUR EVITER UNE LATENCE.
 		// UNE FOIS QUE READ A FINIT, ON A PLUS BESOIN DE LUI QUOIQU'IL SOIT ENTRAIN DE FAIRE.
 		kill(pid, SIGKILL);

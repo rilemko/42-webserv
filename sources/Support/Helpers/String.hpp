@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   String.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/26 22:30:54 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 16:52:01 by muteza           ###   ########.fr       */
+/*   Updated: 2024/07/02 22:19:56 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ class String
 		virtual						~String() = 0;
 
 	public   :
-
 		static void 				custom_strcpy(char* dest, const char* src);
 		static int					count(const string &subject, const string &find);
 		static string				replace(string subject, const string &from, const string &to);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/28 10:30:57 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/02 16:26:45 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 		// Add all servers to epoll
 		// ==============================================
 
-		epoll_event	e = {EPOLLIN, {0}};
+		epoll_event	e = {EPOLLIN | EPOLLET, {0}};
 
 		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing...
 		{

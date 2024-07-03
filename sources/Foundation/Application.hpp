@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:25 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 14:23:03 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/03 21:49:52 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,10 @@ class Application : public Abortable
 {
 	private  :
 		string						_basedir;
-		map<const int,Request*>		_chunked;
+		string						_config;
 		map<const int,time_t>		_clients;
 		int							_epollfd;
+		map<const int,Request*>		_pending;
 		vector<Server*>				_servers;
 
 	public   :
@@ -56,6 +57,8 @@ class Application : public Abortable
 		void						end(const int &fd);
 		void						handle(const int &fd);
 		void						out();
+
+		void						error(const int &fd, const size_t &status, const string &packet);
 
 	public   :
 		Application&				operator=(const Application &rhs);

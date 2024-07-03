@@ -6,7 +6,7 @@
 #    By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:43:39 by mconreau          #+#    #+#              #
-#    Updated: 2024/06/30 13:49:55 by mconreau         ###   ########.fr        #
+#    Updated: 2024/07/02 17:10:03 by mconreau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ COMPILER_PROGRAM_DEBUG	:=	-fsanitize=undefined
 COMPILER_PROGRAM_FLAGS	:=	-O3 -o
 COMPILER_PROGRAM_OTHER	:=	
 COMPILER_OBJECTS		:=	c++
-COMPILER_OBJECTS_FLAGS	:=	-O3 -g -Wall -Werror -Wextra #-std=c++98 -pedantic
+COMPILER_OBJECTS_FLAGS	:=	-O3 -g -Wall -Werror -Wextra -std=c++98 -pedantic
 
 # > EXTENSIONS <<<<<<<<<<<
 
