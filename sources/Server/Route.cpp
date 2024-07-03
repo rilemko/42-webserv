@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 18:09:26 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/03 15:29:26 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,15 +112,17 @@ Route::match(Request &request) const
 Route&
 Route::operator=(const Route &rhs)
 {
-	this->dirlst = rhs.dirlst;
-	this->dindex = rhs.dindex;
-	this->method = rhs.method;
-	this->passcgi = rhs.passcgi;
-	this->rewrite = rhs.rewrite;
-	this->rooting = rhs.rooting;
-	this->target = rhs.target;
-	this->upload = rhs.upload;
-	this->isDuplicate = rhs.isDuplicate;
+	if (this != &rhs) {
+		this->dirlst = rhs.dirlst;
+		this->dindex = rhs.dindex;
+		this->method = rhs.method;
+		this->passcgi = rhs.passcgi;
+		this->rewrite = rhs.rewrite;
+		this->rooting = rhs.rooting;
+		this->target = rhs.target;
+		this->upload = rhs.upload;
+		this->isDuplicate = rhs.isDuplicate;
+	}
 	return (*this);
 }
 
@@ -128,7 +130,7 @@ void
 Route::handleCgiPass(const int lineNumber, const string &value)
 {
 	if (isDuplicate["cgi_pass"]) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". CGI pass directive already . Replacing old value ...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". CGI pass directive already set . Replacing old value ...");
 	}
 	else {
 		isDuplicate["cgi_pass"] = true;
