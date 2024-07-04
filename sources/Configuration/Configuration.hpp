@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/22 06:05:26 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/04 11:18:16 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class Configuration : public Abortable
 {
 	private  :
 		vector<Server*>				_servers;
+		bool						_isNotRoute;
 
 	public   :
 									Configuration(const string &config, const int &epollfd);
