@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/04 11:44:08 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/05 16:24:35 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,30 @@
 
 Configuration::Configuration(const string &config, const int &epollfd) : _isNotRoute(false)
 {
-	ifstream	stream(config.c_str());
-	size_t		context = 0, y = 0; // "context": 0 = none, 1 = server, 2 = route; "y": number of the line, can be used for error message if needed
-	string		line;
-	Server*		currentServer = NULL;
-	Route*		currentRoute = NULL;
+	ifstream		stream(config.c_str());
+	size_t			context = 0, y = 0; // "context": 0 = none, 1 = server, 2 = route; "y": number of the line, can be used for error message if needed
+	string			line;
+	Server*			currentServer = NULL;
+	Route*			currentRoute = NULL;
+	ostringstream	buffer;
 
 	if (!stream.is_open())
 		this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false and print message to stderr)
 	else
 	{
 		Logger::info("Reading configuration: " + config);
-		while (this->_status && getline(stream, line, '\n') && ++y) // While "_status" == true and there is a line
+		while (std::getline(stream, line)) {
+			line = String::strim(line, " \f\r\t\v");
+			y++;
+			string reformattedLine = reformatLine(line, y);
+			buffer << reformattedLine << std::endl;
+		}
+		istringstream stream2(buffer.str());
+		while (this->_status && getline(stream2, line, '\n')) // While "_status" == true and there is a line
 		{
+			stringstream lineStream(line);
+			lineStream >> y;
+			getline(lineStream, line);
 			line = String::strim(line, " \f\r\t\v"); // Trim the line
 			if (context == 0 && line == "{") // If context = none and line == "{"
 			{
@@ -244,4 +255,42 @@ Configuration::operator=(const Configuration &rhs)
 Configuration::operator vector<Server*>() const
 {
 	return (this->_servers);
+}
+
+string
+Configuration::reformatLine(const std::string &line, int sourceLineNumber) {
+	std::stringstream result;
+	size_t len = line.size();
+	bool newLine = true;
+
+	for (size_t i = 0; i < len; ++i) {
+		if (newLine) {
+			result << sourceLineNumber << " ";
+			newLine = false;
+		}
+		if (line.substr(i, 9) == "location " && i + 9 < len) {
+			result << "location ";
+			i += 9;
+			while (i < len && line[i] != '{') {
+				result << line[i];
+				++i;
+			}
+			if (i < len && line[i] == '{') {
+				result << " {\n" << sourceLineNumber << " ";
+				newLine = false; //true;
+			}
+		} else {
+			if (line[i] == '{' || line[i] == '}') {
+				if (!newLine) {
+					result << '\n';
+				}
+				result << sourceLineNumber << ' ' << line[i] << '\n';
+				newLine = true;
+			} else {
+				result << line[i];
+			}
+		}
+	}
+	std::string reformatted = result.str();
+	return reformatted;
 }
