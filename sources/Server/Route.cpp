@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/03 15:29:26 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/07 07:38:15 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,4 +237,7 @@ Route::handleUploadTo(const int lineNumber, const string &value)
 		isDuplicate["uploadTo"] = true;
 	}
 	this->upload = value;
+	if (!upload.empty() && upload[upload.size() - 1] != '/') {
+		this->upload += '/';
+	}
 }
