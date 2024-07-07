@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 07:38:15 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/07 22:21:10 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,13 +180,11 @@ Route::handleMethods(const int lineNumber, const string &value)
 	if (isDuplicate["methods"]) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". Methods directive already set. Adding new value(s) ...");
 	} else {
+		this->method.clear();
 		isDuplicate["methods"] = true;
 	}
 	stringstream ss(value);
 	string method;
-	if (!isDuplicate["methods"]) {
-		this->method.clear();
-	}
 	while (ss >> method)
 	{
 		this->method.push_back(method);
