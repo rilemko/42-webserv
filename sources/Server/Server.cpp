@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 19:16:21 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:08:23 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@ Server::Server() :
 	this->listen.first = "0.0.0.0";
 	this->listen.second = "80";
 	this->snames.push_back("*");
+	this->isDuplicate["errors"] = false;
+	this->isDuplicate["listen"] = false;
+	this->isDuplicate["maxbdy"] = false;
+	this->isDuplicate["snames"] = false;
 }
 
 Server::Server(const Server &src)
@@ -49,28 +53,28 @@ Server::run()
 }
 
 void
-Server::addDirective(const string &directive)
+Server::addDirective(const int lineNumber, const string &directive)
 {
 	string key, value;
 	stringstream ss(directive);
 
 	ss >> key;
 	if (!getline(ss, value)) {
-		Logger::warn("Failed to read server directive. skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to read server directive. skipping ...");
 		return;
 	}
 	value = String::strim(value, " \f\r\t\v");
 
 	if (key == "errors_page") {
-		handleErrorsPage(value);
+		handleErrorsPage(lineNumber, value);
 	} else if (key == "listen") {
-		handleListen(value);
+		handleListen(lineNumber, value);
 	} else if (key == "max_body_size") {
-		handleMaxBodySize(value);
+		handleMaxBodySize(lineNumber, value);
 	} else if (key == "server_name") {
-		handleServerName(value);
+		handleServerName(lineNumber, value);
 	} else {
-		Logger::warn("Unknown server directive : " + directive);
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Unknown server directive : " + directive);
 	}
 }
 
@@ -130,19 +134,26 @@ Server::match(Request &request) const
 Server&
 Server::operator=(const Server &rhs)
 {
-	this->errors = rhs.errors;
-	this->listen = rhs.listen;
-	this->maxbdy = rhs.maxbdy;
-	this->routes = rhs.routes;
-	this->snames = rhs.snames;
-	this->socket = rhs.socket;
-	this->target = rhs.target;
+	if (this != &rhs) {
+		this->errors = rhs.errors;
+		this->listen = rhs.listen;
+		this->maxbdy = rhs.maxbdy;
+		this->routes = rhs.routes;
+		this->snames = rhs.snames;
+		this->socket = rhs.socket;
+		this->target = rhs.target;
+		this->isDuplicate = rhs.isDuplicate;
+	}
 	return (*this);
 }
 
 void
-Server::handleErrorsPage(const string &value)
+Server::handleErrorsPage(const int lineNumber, const string &value)
 {
+	if (isDuplicate["errors"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Errors page directive already defined. New value(s) may be added ...");
+	}
+	isDuplicate["errors"] = true;
 	stringstream 	ss(value);
 	vector<int> 	codes;
 	string			token;
@@ -153,7 +164,7 @@ Server::handleErrorsPage(const string &value)
 		tokens.push_back(token);
 	}
 	if (tokens.size() < 2) {
-		Logger::warn("Invalid error page parameter. Skipping...");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error page parameter. Skipping ...");
 		return;
 	}
 	page = tokens.back();	// last one contains the page
@@ -161,32 +172,33 @@ Server::handleErrorsPage(const string &value)
 	for (size_t i = 0; i < tokens.size(); ++i) {
 		int code = ::atoi(tokens[i].c_str());
 		if (code < 100 || code > 599) {
-			Logger::warn("Invalid error code. Skipping...");
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Invalid error code: " + String::tostr(code) + ". Skipping ...");
 			continue;
 		}
-		if (this->errors.find(code) == this->errors.end()) {
-			this->errors[code] = page;
+		if (this->errors.find(code) != this->errors.end()) {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Error code " + String::tostr(code) + " already set. Replacing old value ...");
 		}
-		else {
-			Logger::warn("Error code already in database. Skipping...");
-		}
+		this->errors[code] = page;
 	}
 }
 
 void
-Server::handleListen(const string &value)
+Server::handleListen(const int lineNumber, const string &value)
 {
-	stringstream 	ss(value);
+	if (isDuplicate["listen"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Listen directive already defined. Replacing old value ...");
+	}
+	isDuplicate["listen"] = true;
+	stringstream ss(value);
 	string firstValue;
-
 	ss >> firstValue;
 	size_t pos1 = firstValue.find(':');
 	if (pos1 != string::npos)
 	{
-		if (!value.substr(0, pos1).empty()) {
+		if (!firstValue.substr(0, pos1).empty()) {
 			this->listen.first = firstValue.substr(0, pos1);
 		}
-		if (!value.substr(pos1 + 1).empty()) {
+		if (!firstValue.substr(pos1 + 1).empty()) {
 			this->listen.second = firstValue.substr(pos1 + 1);
 		}
 	}
@@ -202,38 +214,77 @@ Server::handleListen(const string &value)
 	}
 	string extraParam;
 	while (ss >> extraParam) {
-		Logger::warn("Skipping extra parameter: " + extraParam);
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Skipping extra parameter: " + extraParam);
 	}
 }
 
 void
-Server::handleMaxBodySize(const string &value)
+Server::handleMaxBodySize(const int lineNumber, const string &value)
 {
-	stringstream ss(value);
-	size_t	maxbdyValue;
-	ss >> maxbdyValue;
-	if (ss.fail() || !ss.eof())
+	if (isDuplicate["maxbdy"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Max body size directive already defined. Replacing old value ...");
+	}
+	if (value.empty())
 	{
-		Logger::warn("Failed to convert maxbdy value, default value used.");
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". No value set for maxbdy. Skipping ...");
+		return;
+	}
+	if (value[0] == '-')
+	{
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Negative value is not possible for maxbdy. Skipping ...");
+		return;
+	}
+	stringstream ss(value);
+	size_t maxbdyValue = 0;
+	ss >> maxbdyValue;
+	if (ss.fail())
+	{
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Failed to convert maxbdy value. Skipping ...");
+		return;
+	}
+	if (!ss.eof()) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Too many arguments, first value used to set maxbdy.");
+	}
+	if (maxbdyValue == 0) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". maxbdy value can't be zero. Skipping ...");
 	}
 	else
 	{
-		this->maxbdy = maxbdyValue;
+		this->maxbdy =  maxbdyValue;
 	}
 }
 
-void
-Server::handleServerName(const string &value)
-{
-	if (value.empty())
-	{
-		return;
+bool
+Server::contains(const vector<string>& vec, const string& value) {
+	for (size_t i = 0; i < vec.size(); ++i) {
+		if (vec[i] == value) {
+			return (true);
+		}
 	}
-	this->snames.clear();
+	return (false);
+}
+
+void
+Server::handleServerName(const int lineNumber, const string &value)
+{
+	if (isDuplicate["snames"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Server name directive already defined. Adding new value(s) ...");
+	}
+	if (!isDuplicate["snames"]) {
+		this->snames.clear();
+	}
 	stringstream ss(value);
 	string name;
 	while (ss >> name)
 	{
-		this->snames.push_back(name);
+		if (name == "*" && this->snames.size() == 1) {
+			this->snames.push_back(name);
+		}
+		else if (!contains(snames,name)) {
+			this->snames.push_back(name);
+		}
+		else {
+			Logger::warn("Line: " + String::tostr(lineNumber) + ". Duplicate server name detected: " + name + ". Skipping ...");
+		}
 	}
 }

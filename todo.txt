@@ -1,12 +1,8 @@
-[ ] TODO : Improve request format checking (in "Request" class) in the case the request is badly formatted or invalid
-[ ] TODO : Handle file uploading ("upload" directive for upload location)
-[ ] TODO : Handle HTTP errors
-		- No route match (404), file is missing (404 ?), bad request (400), server problem (reading file problem ?) (500),
-		method not allowed (405), no content-length specified (411), wrong HTTP version (505), max request size (413)...
-		- Default error can just be a <h1> tag with "Error {code}" text if not specified in the config, or the file specified if there is one.
-		- The CGI program should normally write the whole response, with status code and headers included...
 [ ] TODO : Setup correct Mime Type for response
 [ ] TODO : Add Allow header for invalid method error response
+[ ] TODO : Improve and optimize Request::unbound()
+[ ] TODO : Rework Manager::run() logic
+[ ] TODO : Handle session
 
 [X] TODO : Create the vector<Server*> by parsing instead of hard-add it in the "Configuration" class
 		- (i) Each "Server" class contains a vector<Route>
@@ -36,3 +32,10 @@
 		0\r\n
 		\r\n
 [X] FIX  : Fix correct chunked request when recv receive two chunk in one read
+[X] TODO : Handle file uploading ("upload" directive for upload location)
+[X] TODO : Improve request format checking (in "Request" class) in the case the request is badly formatted or invalid
+[X] TODO : Handle HTTP errors
+		- No route match (404), file is missing (404 ?), bad request (400), server problem (reading file problem ?) (500),
+		method not allowed (405), no content-length specified (411), wrong HTTP version (505), max request size (413)...
+		- Default error can just be a <h1> tag with "Error {code}" text if not specified in the config, or the file specified if there is one.
+		- The CGI program should normally write the whole response, with status code and headers included...

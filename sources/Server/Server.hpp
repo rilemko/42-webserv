@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/24 14:25:13 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/03 16:06:15 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,16 @@ class Server
 		int							socket;
 		pair<in_addr_t,in_port_t>	target;
 
+	private :
+		map<string, bool>			isDuplicate;
+
 	public   :
 									Server();
 									Server(const Server &src);
 									~Server();
 
 		void						run();
-		void						addDirective(const string &directive);
+		void						addDirective(const int lineNumber, const string &directive);
 		void						PrintServer(void) const;
 
 		size_t						check(Request &request) const;
@@ -50,9 +53,9 @@ class Server
 		Server&						operator=(const Server &rhs);
 
 	private   :
-		void						handleErrorsPage(const string &value);
-		void						handleListen(const string &value);
-		void						handleMaxBodySize(const string &value);
-		void						handleServerName(const string &value);
-
+		bool						contains(const vector<string>& vec, const string& value);
+		void						handleErrorsPage(const int lineNumber, const string &value);
+		void						handleListen(const int lineNumber, const string &value);
+		void						handleMaxBodySize(const int lineNumber, const string &value);
+		void						handleServerName(const int lineNumber, const string &value);
 };

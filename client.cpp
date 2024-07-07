@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/22 20:09:54 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/03 20:33:26 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 18:55:08 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,11 @@ main(void)
 	if (::connect(socket, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1)
 		return (perror("connect"), 1);
 
-	send(socket, "POST / HTTP/1.1\r\nHost: 0.0.0.0:3000\r\nContent-Length: 12\r\n\r\nHello");
+	send(socket, "POST / HTTP/1.1\r\nHost: 0.0.0.0:3000\r\nContent-Type: multipart/form-data; boundary=test\r\nContent-Length: 12\r\n\r\nHello");
 	sleep(1);
 	send(socket, " world!");
 
-	/*send(socket, "POST / HTTP/1.1\r\nHost: 0.0.0.0:3000\r\nTransfer-Encoding: chunked\r\nConnection: keep-alive\r\n\r\n2\r\naa\r\n");
+	/*send(socket, "POST / HTTP/1.1\r\nHost: 0.0.0.0:3000\r\nTransfer-Encoding: chunked\r\nContent-Type: multipart/form-data; boundary=test\r\nConnection: keep-alive\r\n\r\n2\r\naa\r\n");
 	::usleep(10);
 	send(socket, "4\r\nbbbb\r\n");
 	::usleep(10);

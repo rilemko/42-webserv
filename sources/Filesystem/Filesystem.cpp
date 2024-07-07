@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 15:09:53 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 18:19:21 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,14 +42,14 @@ Filesystem::get(const string &path)
 {
 	ostringstream 	oss;
 
-	oss << ifstream(path.c_str(), ios::in | ios::binary).rdbuf();
+	oss << ifstream(path.c_str(), ios::binary | ios::in).rdbuf();
 	return (oss.str());
 }
 
 void
 Filesystem::set(const string &path, const string &data)
 {
-	ofstream(path.c_str(), ios::out | ios::binary) << data.c_str();
+	ofstream(path.c_str(), ios::binary | ios::out).write(data.c_str(), data.size());
 }
 
 bool
@@ -101,27 +101,24 @@ Filesystem::isXcutable(const std::string &path)
 string
 Filesystem::recv(const int &fd)
 {
-	string	packet;
-	char	buffer[512];
+	string	data;
+	char	buffer[2048];
 
-	for (int b = 0; (b = ::recv(fd, buffer, 511, MSG_DONTWAIT)) > 0;)
-	{
-		buffer[b] = '\0';
-		packet += buffer;
-	}
-	return (packet);
+	for (int b = 0; (b = ::recv(fd, buffer, 2048, MSG_DONTWAIT)) > 0;)
+		data.append(buffer, b);
+	return (data);
 }
 
 void
 Filesystem::send(const int &fd, const string &data)
 {
-	const int	len = data.size();
-	int 		b = 0, r = len, total = 0;
+	const int	l = data.size();
+	int 		b = 0, r = l, t = 0;
 
-	while (total < len)
+	while (t < l)
 	{
-		r -= (b = ::send(fd, &data[total], r, MSG_DONTWAIT));
-		total += b;
+		r -= (b = ::send(fd, &data[t], r, MSG_DONTWAIT));
+		t += b;
 	}
 }
 

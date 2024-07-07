@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 16:26:45 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/03 21:59:12 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,17 +69,20 @@ Configuration::Configuration(const string &config, const int &epollfd)
 				{
 					// Server directive.
 					Logger::dump("Add server directive: " + line);
-					currentServer->addDirective(line);
+					currentServer->addDirective(y, line);
 				}
 				if (context == 2)
 				{
 					// Location directive.
 					Logger::dump("Add route directive: " + line);
-					currentRoute->addDirective(line);
+					currentRoute->addDirective(y, line);
 				}
 			}
+			else if (!line.size()) {
+				// skip empty line
+			}
 			else {
-				Logger::warn("Line: " + String::tostr(y) + ". Unrecognized directive: " + line + ". Skipping...");
+				Logger::warn("Line: " + String::tostr(y) + ". Unrecognized directive: " + line + ". Skipping ...");
 			}
 		}
 		stream.close();
@@ -131,7 +134,7 @@ Configuration::Configuration(const string &config, const int &epollfd)
 
 		epoll_event	e = {EPOLLIN | EPOLLET, {0}};
 
-		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing...
+		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing ...
 		{
 			try
 			{

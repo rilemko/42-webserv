@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/25 13:24:30 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/02 14:51:40 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,15 @@ class Route
 		string						target;
 		string						upload;
 
+	private :
+		map<string, bool>			isDuplicate;
+
 	public   :
 									Route();
 									Route(const Route &src);
 									~Route();
 
-		void						addDirective(const string &directive);
+		void						addDirective(const int lineNumber, const string &directive);
 		void						printRoute(void) const;
 
 		size_t						check(Request &request) const;
@@ -45,11 +48,11 @@ class Route
 		Route&						operator=(const Route &rhs);
 
 	private   :
-		void handleCgiPass(const string &value);
-		void handleListing(const string &value);
-		void handleIndex(const string &value);
-		void handleMethods(const string &value);
-		void handleRewrite(const string &value);
-		void handleRoot(const string &value);
-		void handleUploadTo(const string &value);
+		void handleCgiPass(const int lineNumber, const string &value);
+		void handleListing(const int lineNumber, const string &value);
+		void handleIndex(const int lineNumber, const string &value);
+		void handleMethods(const int lineNumber, const string &value);
+		void handleRewrite(const int lineNumber, const string &value);
+		void handleRoot(const int lineNumber, const string &value);
+		void handleUploadTo(const int lineNumber, const string &value);
 };

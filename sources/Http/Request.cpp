@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/03 21:17:16 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 18:26:42 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ Request::~Request()
 
 // 101 : Pending
 // 102 : Chunked
+// 103 : Bounded
 
 void
 Request::recv()
@@ -41,11 +42,6 @@ Request::recv()
 		return (this->unchunk(packet));
 	if (this->_remain > 0)
 	{
-		size_t			cl;
-
-		if (!(stringstream(this->getHeader("content-length", "0")) >> cl))
-				return (this->setStatus(400));
-
 		const string	bd = packet.substr(0, this->_remain);
 		const size_t	bl = packet.size();
 
@@ -53,7 +49,14 @@ Request::recv()
 		this->_packet += bd;
 		this->_remain -= bl;
 
-		return (this->setStatus(this->_remain > 0 ? 101 : 200));
+		if (this->_remain > 0)
+			return (this->setStatus(101));
+		else
+		{
+			if (String::lowercase(this->getHeader("content-type", "")).find("multipart/form-data") == 0)
+				this->unbound(this->_packet);
+			return (this->setStatus(200));
+		}
 	}
 	if ((this->_packet + packet).find("\r\n\r\n") == string::npos)
 		return (this->_packet += packet, this->setStatus(101));
@@ -67,13 +70,9 @@ Request::recv()
 		stringstream	t(h.substr(0, (p = h.find("\r\n") + 2) - 2));
 		string			v;
 
-		if (!(t >> this->_method >> this->_target >> v))
-			return (this->setStatus(400));
-		else
-		{
-			if (v != "HTTP/1.1") return (this->setStatus(400));
-			if (this->_target.size() > 2000) return (this->setStatus(414));
-		}
+		if (!(t >> this->_method >> this->_target >> v)) return (this->setStatus(400));
+		if (v != "HTTP/1.1") return (this->setStatus(505));
+		if (this->_target.size() > 2000) return (this->setStatus(414));
 
 		size_t			d = 0;
 
@@ -100,9 +99,11 @@ Request::recv()
 
 		if (this->_method == "POST" || this->_method == "PUT" || this->_method == "PATCH")
 		{
-			if (this->getHeader("transfer-encoding", "") == "chunked")
+			p += 2;
+
+			if (String::lowercase(this->getHeader("transfer-encoding", "")) == "chunked")
 			{
-				const string	bd = this->_packet.substr(this->_packet.find("\r\n\r\n") + 4);
+				const string	bd = this->_packet.substr(p);
 				return (this->_packet.clear(), this->setStatus(102), this->unchunk(bd));
 			}
 
@@ -111,26 +112,48 @@ Request::recv()
 			if (!(stringstream(this->getHeader("content-length", "0")) >> cl))
 				return (this->setStatus(400));
 
-			const string	bd = this->_packet.substr(this->_packet.find("\r\n\r\n") + 4, cl);
-			const size_t	bl = bd.size();
+			string					bd = this->_packet.substr(p, cl);
+			const size_t			bl = bd.size();
 
-			this->_length += bl;
+			this->_length = bl;
 			this->_packet = bd;
 
-			if (this->_length < cl)
-				return (this->_remain = cl - bl, this->_status = 101, (void) NULL);
+			if (this->_length < cl) return (this->_remain = cl - bl, this->setStatus(101));
+
+			if (String::lowercase(this->getHeader("content-type", "")).find("multipart/form-data") == 0)
+				return (this->unbound(this->_packet));
 		}
 		else
 			this->_packet.clear();
 	}
-
-	
 }
 
 void
 Request::unbound(const string &packet)
 {
-	(void) packet;
+	const string	ct = this->getHeader("content-type", "");
+
+	if (!String::match("multipart/form-data; boundary=*", String::lowercase(ct)))
+		return (this->setStatus(400));
+	else
+	{
+		const string	bn = "--" + ct.substr(ct.find('=') + 1);
+		const size_t	bs = bn.size();
+
+		for (size_t e = 0, p = bs + 2; p < packet.size() && (e = packet.find(bn, p)) != string::npos;)
+		{
+			const string	bp = packet.substr(p, packet.find(bn, p) - p - 2);
+
+			p = e + bs + 2;
+
+			if (!String::match("Content-Disposition: form-data; name=\"?*\"; filename=\"?*\"\r\n*\r\n\r\n*", bp))
+				continue ;
+
+			const size_t	fs = bp.find("filename=\"") + 10;
+
+			this->_upload[(bp.substr(fs, bp.find("\"", fs) - fs))] = bp.substr(bp.find("\r\n\r\n") + 4);
+		}
+	}
 }
 
 void
@@ -155,7 +178,12 @@ Request::unchunk(const string &packet)
 				ss << hex << bd;
 				ss >> cl;
 
-				if (cl == 0) return (this->setStatus(200));
+				if (cl == 0)
+				{
+					if (String::lowercase(this->getHeader("content-type", "")).find("multipart/form-data") == 0)
+						this->unbound(this->_packet);
+					return (this->setStatus(200));
+				}
 				this->_remain += cl;
 			}
 			else
@@ -172,6 +200,12 @@ Request::unchunk(const string &packet)
 			++i;
 	}
 	this->setStatus(102);
+}
+
+string
+Request::getCookie(const string &key, const string &other)
+{
+	return (this->_cookie.find(key) != this->_cookie.end() ? this->_cookie[key] : other);
 }
 
 string
@@ -220,6 +254,12 @@ string
 Request::getTarget() const
 {
 	return (this->_target);
+}
+
+map<string,string>
+Request::getUpload() const
+{
+	return (this->_upload);
 }
 
 void

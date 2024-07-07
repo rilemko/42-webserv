@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 16:42:59 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/12 22:05:38 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 17:40:47 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ using namespace std;
 
 class Filesystem
 {
+	typedef basic_string<unsigned char> ustring;
+	
 	private  :
 		virtual						~Filesystem() = 0;
 
