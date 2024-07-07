@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 18:35:36 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 21:54:27 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,6 @@ Application::~Application()
 {
 }
 
-void
-Application::end(int i)
-{
-	(void) i;
-	Application::_running = false;
-}
-
 bool
 Application::run()
 {
@@ -58,9 +51,9 @@ Application::run()
 	if (!servers.size())
 		return (this->abort("No server to listen on."));
 
-	epoll_event		events[16];
-	const int		hfd = servers.back()->socket;
 	Manager			manager(epollfd, this->_basedir, servers);
+	const int		hfd = servers.back()->socket;
+	epoll_event		events[16];
 
 	servers.clear();
 
@@ -80,6 +73,13 @@ Application::run()
 		manager.out();
 	}
 	return (this->_status);
+}
+
+void
+Application::end(int i)
+{
+	(void) i;
+	Application::_running = false;
 }
 
 Application&

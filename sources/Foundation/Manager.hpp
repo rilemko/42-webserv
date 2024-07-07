@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:25 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 18:40:23 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 22:47:28 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ class Manager
 									~Manager();
 	
 		void						run(const int &fd);
+
+		void						recv();
 
 		void						add(const int &fd);
 		void						end(const int &fd);

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 19:46:27 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 23:13:12 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ Manager::run(const int &fd)
 		{
 			if ((status = server->check(*req)) != 200)
 			{
-				Response(fd).setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
+				Response(fd).setStatus(status).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
 				goto next;
 			}
 			else
@@ -71,7 +71,7 @@ Manager::run(const int &fd)
 					{
 						if ((status = route->check(*req)) != 200)
 						{
-							Response(fd).setStatus(status).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
+							Response(fd).setStatus(status).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(server->errors[status] != "" ? Filesystem::get(server->errors[status]) : Template::error(status)).send();
 							goto next;
 						}
 						else
@@ -80,7 +80,7 @@ Manager::run(const int &fd)
 							{
 								if (!Filesystem::isDir(route->upload))
 								{
-									Response(fd).setStatus(500).addPacket(server->errors[500] != "" ? Filesystem::get(server->errors[500]) : Template::error(500)).send();
+									Response(fd).setStatus(500).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(server->errors[500] != "" ? Filesystem::get(server->errors[500]) : Template::error(500)).send();
 									goto next;
 								}
 								
@@ -91,7 +91,7 @@ Manager::run(const int &fd)
 							}
 							
 							if (route->rewrite.first != 0)
-								Response(fd).setStatus(route->rewrite.first).addHeader("Location", route->rewrite.second).send();
+								Response(fd).setStatus(route->rewrite.first).setSessid(req->getCookie("sessid", String::rand(64))).addHeader("Location", route->rewrite.second).send();
 							else if (route->passcgi.size())
 							{
 								const string	t = route->rooting + req->getTarget();
@@ -99,33 +99,33 @@ Manager::run(const int &fd)
 								if (Filesystem::isDir(route->rooting + req->getTarget()) && route->dindex.size() && Filesystem::isReg(route->rooting + req->getTarget() + route->dindex))
 									Response(fd).send(Gateway().cgirun(*req, route->passcgi, this->_basedir + "/" + t + route->dindex));
 								else if (Filesystem::isReg(route->rooting + req->getTarget()))
-									Response(fd).send(Gateway().cgirun(*req, route->passcgi, this->_basedir + "/" + t));
+									Response(fd).setSessid(req->getCookie("sessid", String::rand(64))).send(Gateway().cgirun(*req, route->passcgi, this->_basedir + "/" + t));
 								else
-									Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+									Response(fd).setStatus(404).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							}
 							else if (Filesystem::isReg(route->rooting + req->getTarget()))
-								Response(fd).addPacket(Filesystem::get(route->rooting + req->getTarget())).send();
+								Response(fd).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(Filesystem::get(route->rooting + req->getTarget())).send();
 							else if (Filesystem::isDir(route->rooting + req->getTarget()))
 							{
 								if (route->dindex.size() && Filesystem::isReg(route->rooting + req->getTarget() + route->dindex))
-									Response(fd).addPacket(Filesystem::get(route->rooting + req->getTarget() + route->dindex)).send();
+									Response(fd).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(Filesystem::get(route->rooting + req->getTarget() + route->dindex)).send();
 								else if (route->dirlst)
-									Response(fd).addPacket(Template::index(route->rooting + req->getTarget())).send();
+									Response(fd).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(Template::index(route->rooting + req->getTarget())).send();
 								else
-									Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+									Response(fd).setStatus(404).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							}
 							else
-								Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+								Response(fd).setStatus(404).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 							goto next;
 						}
 					}
 				}
-				Response(fd).setStatus(404).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
+				Response(fd).setStatus(404).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(server->errors[404] != "" ? Filesystem::get(server->errors[404]) : Template::error(404)).send();
 				goto next;
 			}
 		}
 	}
-	Response(fd).setStatus(404).addPacket(Template::error(404)).send();
+	Response(fd).setStatus(404).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(Template::error(404)).send();
 	next: ;
 
 	// ==============================================================

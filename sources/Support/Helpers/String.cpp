@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 16:06:15 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 22:19:42 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 23:11:25 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,17 @@ String::uppercase(string subject)
 	for (int i = 0, j = subject.size(); i < j; i++)
 		subject[i] = ::toupper(subject[i]);
 	return (subject);
+}
+
+string
+String::rand(const size_t &size)
+{
+	static const char 	set[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	string				content;
+
+	for (size_t i = 0; i < size; i++)
+		content += set[::rand() % (sizeof(set) - 1)];
+	return (content);
 }
 
 void String::custom_strcpy(char* dest, const char* src) 

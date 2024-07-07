@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/30 22:40:34 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/07 23:00:13 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ Response::send()
 	this->addHeader("Content-Length", String::tostr(this->_packet.size() - 2));
 	this->addHeader("Content-Type", "text/html");
 	this->addHeader("Date", Datetime(Datetime::RFC7231));
+	this->addCookie("sessid", this->_sessid);
 
 	Filesystem::send(this->_socket, this->_header + this->_packet);
 }
@@ -74,6 +75,13 @@ Response::addPacket(const string &packet)
 }
 
 Response&
+Response::setSessid(const string &sessid)
+{
+	this->_sessid = sessid;
+	return (*this);
+}
+
+Response&
 Response::setStatus(const size_t &status)
 {
 	this->_status = status;
@@ -85,6 +93,7 @@ Response::operator=(const Response &rhs)
 {
 	this->_header = rhs._header;
 	this->_packet = rhs._packet;
+	this->_sessid = rhs._sessid;
 	this->_socket = rhs._socket;
 	this->_status = rhs._status;
 	return (*this);
