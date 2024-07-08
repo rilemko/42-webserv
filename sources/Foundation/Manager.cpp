@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 23:13:12 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/08 13:17:59 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,11 @@ Manager::run(const int &fd)
 						}
 						else
 						{
+							if ((status = req->getStatus()) != 200)
+							{
+								Response(fd).setStatus(status).setSessid(req->getCookie("sessid", String::rand(64))).addPacket(Template::error(status)).send();
+								goto next;
+							}
 							if (route->upload != "")
 							{
 								if (!Filesystem::isDir(route->upload))

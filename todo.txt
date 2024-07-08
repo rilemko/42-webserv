@@ -1,7 +1,6 @@
 [ ] TODO : Setup correct Mime Type for response
 [ ] TODO : Add Allow header for invalid method error response
 [ ] TODO : Improve and optimize Request::unbound()
-[ ] TODO : Rework Request cookie parsing logic
 [ ] TODO : Rework Manager::run() logic
 [ ] TODO : Pass set to String::rand as parameter
 
@@ -41,3 +40,4 @@
 		- Default error can just be a <h1> tag with "Error {code}" text if not specified in the config, or the file specified if there is one.
 		- The CGI program should normally write the whole response, with status code and headers included...
 [X] TODO : Handle session
+[X] TODO : Rework Request cookie parsing logic

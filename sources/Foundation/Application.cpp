@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 21:54:27 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/08 13:19:56 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ Application::run()
 	vector<Server*>	servers = Configuration(this->_cfgpath.size() ? this->_cfgpath : "config/default.cfg", epollfd);
 
 	if (!servers.size())
-		return (this->abort("No server to listen on."));
+		return (::close(epollfd), this->abort("No server to listen on."));
 
 	Manager			manager(epollfd, this->_basedir, servers);
 	const int		hfd = servers.back()->socket;

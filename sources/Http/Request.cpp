@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 23:15:24 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/08 13:11:40 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,12 +86,14 @@ Request::recv()
 		{
 			const string	lne = h.substr(p, e - p);
 
-			if (!String::match("*:*", lne)) return (this->setStatus(400));
+			if ((d = lne.find(':')) == string::npos)
+				return (this->setStatus(400));
 
-			const string 	key = lne.substr(0, d = lne.find(':'));
+			const string 	key = lne.substr(0, d);
 			const string	val = lne.substr(d + 1);
 
-			if (val.size() > 8000) return (this->setStatus(431));
+			if (val.size() > 8000)
+				return (this->setStatus(431));
 			
 			this->_header[String::lowercase(String::strim(key, " "))] = String::strim(val, " ");
 			p = e + 2;
@@ -100,32 +102,20 @@ Request::recv()
 		if (this->_header.find("host") == this->_header.end())
 			return (this->setStatus(400));
 
-		// ==============================================================
-		// TO REWORK:
-
 		const string	ck = this->getHeader("cookie", "");
 
-		for (size_t s = 0, e = 0; s < ck.size();)
+		for (size_t s = 0, d = 0; s < ck.size();)
 		{
-			if ((e = ck.find('=', s)) == string::npos)
+			const string	lne = ck.substr(s, ck.find(';', s) - s);
+
+			if ((d = lne.find('=')) == string::npos)
 				return (this->setStatus(400));
-			
-			const string	key = ck.substr(s, e - s);
 
-			s = e + 1;
+			const string	key = lne.substr(0, d);
+			const string	val = lne.substr(d + 1);
 
-			if ((e = ck.find(';', e + 1)) == string::npos)
-				e = ck.size();
-
-			const string	val = ck.substr(s, e - s);
-			
-			s += val.size() + 1;
-			
-			this->_cookie[String::strim(key, " ")] = String::strim(val, " ");
-			cout << key + ":" + val << endl;
+			s += lne.size() + 1;
 		}
-
-		// ==============================================================
 
 		if (this->_method == "POST" || this->_method == "PUT" || this->_method == "PATCH")
 		{
