@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   String.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/26 22:30:54 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 16:52:01 by muteza           ###   ########.fr       */
+/*   Updated: 2024/07/09 12:46:05 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include <cstdlib>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -24,7 +25,6 @@ class String
 		virtual						~String() = 0;
 
 	public   :
-
 		static void 				custom_strcpy(char* dest, const char* src);
 		static int					count(const string &subject, const string &find);
 		static string				replace(string subject, const string &from, const string &to);
@@ -36,6 +36,7 @@ class String
 		static string				join(const vector<string> &array, const string &delimiter);
 		static string				lowercase(string subject);
 		static string				uppercase(string subject);
+		static string				rand(const size_t &size, const string &set);
 		
 		template<typename TYPE>
 		static string				tostr(const TYPE &content);

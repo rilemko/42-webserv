@@ -6,7 +6,7 @@
 #    By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:43:39 by mconreau          #+#    #+#              #
-#    Updated: 2024/07/08 20:01:13 by rdi-marz         ###   ########.fr        #
+#    Updated: 2024/07/10 17:43:26 by rdi-marz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,6 +52,7 @@ PROJECT_SOURCES			:=	$(addprefix $(FOLDER_SOURCES)/, Webserv.cpp			\
 							Filesystem/Filesystem.cpp							\
 							Filesystem/MimeType.cpp								\
 							Foundation/Application.cpp							\
+							Foundation/Manager.cpp								\
 							Gateway/Gateway.cpp									\
 							Http/HttpStatus.cpp									\
 							Http/Request.cpp									\

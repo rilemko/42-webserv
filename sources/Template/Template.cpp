@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 19:48:59 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/16 21:19:08 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/03 21:43:48 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ Template::error(const int &status)
 string
 Template::index(const string &target)
 {
-	vector<string>	files(Filesystem::scandir(target[0] == '/' ? &target[1] : target));
+	vector<string>	files(Filesystem::scandir(target));
 	string			list, packet("\
 <html>\
 	<head>\

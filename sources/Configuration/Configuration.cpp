@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 17:24:15 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:45:11 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,12 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 				currentRoute  = new Route;
 				size_t	pos = line.find(' ');
 				currentRoute->target = line.substr(pos + 1, line.find(' ', pos + 1) - pos - 1);
-				if (currentRoute->target == "/") {
+				if (currentRoute->target.size() > 1)
+					currentRoute->target = String::rtrim(currentRoute->target, "/"); // NEW: TRIM RIGHT SLASHES
+				if (currentRoute->target == "/")
 					currentRoute->target = "*";
-				}
-				routeConfig = new RouteConfiguration();
+				if (currentRoute->target[0] != '/')
+					currentRoute->target = '/' + currentRoute->target; // NEW : ENSURE LEADING SLASH
 				++context;
 			}
 			else if (line == "{") {
@@ -187,7 +189,7 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 		// Add all servers to epoll
 		// ==============================================
 
-		epoll_event	e = {EPOLLIN, {0}};
+		epoll_event	e = {EPOLLIN | EPOLLET, {0}};
 
 		for (size_t i = 0; i < this->_servers.size(); i++) // For each servers created by parsing ...
 		{

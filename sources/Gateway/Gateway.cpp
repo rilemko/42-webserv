@@ -3,30 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/03 17:59:05 by muteza           ###   ########.fr       */
+/*   Updated: 2024/07/10 11:29:50 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Gateway/Gateway.hpp"
 
-Gateway::Gateway() {}
+Gateway::Gateway()
+{
+}
 
-Gateway::Gateway(const Gateway &src) {
+Gateway::Gateway(const Gateway &src)
+{
 	*this = src;
 }
 
-Gateway::~Gateway() {}
-
-Gateway& Gateway::operator=(const Gateway &rhs) {
-	if (this != &rhs) {
-		this->v = rhs.v;
-	}
-	return *this;
+Gateway::~Gateway()
+{
 }
-
+/*
 void Gateway::addenv(const std::string& key, const std::string& value) {
 	std::string str = key + "=" + value;
 	v.push_back(str);
@@ -75,9 +73,76 @@ std::string Gateway::extractPort(const std::string& address) {
 	}
 	return address.substr(colonPos + 1);
 }
-
-std::string Gateway::cgirun(Request& req, const string &passcgi, const string &script)
+*/
+string
+Gateway::run(Request& req, const string &passcgi, const string &script)
 {
+	int		pipe_p2c[2], pipe_c2p[2];
+	pid_t	pid;
+
+	if (pipe(pipe_p2c) != 0)
+        return (Logger::fail("Gateway: Failed to create pipe"), "");
+
+	if (pipe(pipe_c2p) != 0)
+        return (::close(pipe_p2c[0]), ::close(pipe_p2c[1]), Logger::fail("Gateway: Failed to create pipe"), "");
+
+	if ((pid = fork()) == -1)
+		 return (::close(pipe_p2c[0]), ::close(pipe_p2c[1]), ::close(pipe_c2p[0]), ::close(pipe_c2p[1]), Logger::fail("Gateway: Failed to create pipe"), "");
+
+	if (pid == 0)
+    {
+        if (dup2(pipe_p2c[0], 0) != 0 || close(pipe_p2c[0]) != 0 || close(pipe_p2c[1]) != 0)
+        {
+            cerr << "Child: failed to set up standard input\n";
+            exit(1);
+        }
+        if (dup2(pipe_c2p[1], 1) != 1 || close(pipe_c2p[1]) != 0 || close(pipe_c2p[0]) != 0)
+        {
+            cerr << "Child: failed to set up standard output\n";
+            exit(1);
+        }
+
+		Environment	env;
+
+		env.add("REDIRECT_STATUS", "1");
+		env.add("SERVER_PROTOCOL", "HTTP/1.1");
+		env.add("SERVER_NAME", req.getHeader("host", "localhost"));
+		env.add("SERVER_SOFTWARE", "Webserv/1.0.0");
+		env.add("REQUEST_METHOD", req.getMethod());
+		env.add("QUERY_STRING", req.getParams());
+		env.add("CONTENT_TYPE", req.getHeader("content-type", ""));
+		env.add("HTTP_ACCEPT", req.getHeader("accept", ""));
+		env.add("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
+		env.add("HTTP_ACCEPT_ENCODING", req.getHeader("accept-encoding", ""));
+		env.add("HTTP_ACCEPT_LANGUAGE", req.getHeader("accept-language", "en-us"));
+		env.add("HTTP_CONNECTION", req.getHeader("connection", "keep-alive"));
+		env.add("HTTP_COOKIE", req.getHeader("cookie", ""));
+		env.add("REQUEST_URI", req.getTarget() + (req.getParams().size() ? "?" + req.getParams() : ""));
+		env.add("SCRIPT_FILENAME", script);
+		env.add("PATH_INFO", req.getTarget());
+		env.add("CONTENT_LENGTH", String::tostr(req.getLength()));
+
+		char* const agv[] = {const_cast<char*>(passcgi.c_str()), NULL};
+
+        execve(passcgi.c_str(), agv, env);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        close(pipe_p2c[0]);
+        close(pipe_c2p[1]);
+		Filesystem::write(pipe_p2c[1], req.getPacket());
+        close(pipe_p2c[1]);
+        string	response = Filesystem::read(pipe_c2p[0]);
+        close(pipe_c2p[0]);
+
+		return response;
+    }
+}
+/*
+std::string
+Gateway::cgirun(Request& req, const string &passcgi, const string &script) {
+	
 	int pipefd[2];
 	if (pipe(pipefd) == -1) {
 		perror("pipe");
@@ -101,18 +166,6 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 			exit(EXIT_FAILURE);
 		}
 		close(pipefd[1]);
-		// if (strcmp(req.getMethod().c_str(), "GET") == 0)
-		// {
-		// 	if (dup2(pipefd[0], STDIN_FILENO) == -1) 
-		// 	{
-		// 		perror("dup2");
-		// 		close(pipefd[0]);
-		// 		exit(EXIT_FAILURE);
-		// 	}
-		// 	std::cout << "dwadawo" << std::endl;
-		// 	std::cerr << "dwdwadwa" << std::endl;
-		// 	// std::cout << req.getPacket() << std::endl;
-		// }
 
 		addenv("QUERY_STRING", req.getParams());
 		addenv("REQUEST_METHOD", req.getMethod());
@@ -168,4 +221,10 @@ std::string Gateway::cgirun(Request& req, const string &passcgi, const string &s
 		kill(pid, SIGKILL);
 		return response;
 	}
+}*/
+
+Gateway& Gateway::operator=(const Gateway &rhs)
+{
+	(void) rhs;
+	return *this;
 }

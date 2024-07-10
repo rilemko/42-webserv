@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   String.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 16:06:15 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/29 16:57:29 by muteza           ###   ########.fr       */
+/*   Updated: 2024/07/09 12:46:17 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,17 @@ String::uppercase(string subject)
 	for (int i = 0, j = subject.size(); i < j; i++)
 		subject[i] = ::toupper(subject[i]);
 	return (subject);
+}
+
+string
+String::rand(const size_t &size, const string &set)
+{
+	const int	s = set.size() - 1;
+	string		content;
+
+	for (size_t i = 0; i < size; i++)
+		content += set[::rand() % s];
+	return (content);
 }
 
 void String::custom_strcpy(char* dest, const char* src) 

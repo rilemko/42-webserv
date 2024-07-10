@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 16:51:10 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:41:36 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,4 +48,14 @@ class Route
 		bool						match(Request &request) const;
 
 		Route&						operator=(const Route &rhs);
+
+	private   :
+		void handleCgiPass(const int lineNumber, const string &value);
+		void handleListing(const int lineNumber, const string &value);
+		void handleIndex(const int lineNumber, const string &value);
+		void handleMethods(const int lineNumber, const string &value);
+		void handleRewrite(const int lineNumber, const string &value);
+		void handleAlias(const int lineNumber, const string &value);
+		void handleRoot(const int lineNumber, const string &value);
+		void handleUploadTo(const int lineNumber, const string &value);
 };

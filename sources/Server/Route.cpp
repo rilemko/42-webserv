@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 17:14:26 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:43:05 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 Route::Route() :
 	dirlst(true),
 	dindex("/index.html"),
-	rooting("www")
+	rooting("")
 {
 	this->method.push_back("GET");
 	this->method.push_back("POST");
@@ -27,6 +27,14 @@ Route::Route() :
 	this->method.push_back("OPTIONS");
 	this->method.push_back("TRACE");
 	this->method.push_back("PATCH");
+	this->isDuplicate["cgi_pass"] = false;
+	this->isDuplicate["listing"] = false;
+	this->isDuplicate["index"] = false;
+	this->isDuplicate["methods"] = false;
+	this->isDuplicate["rewrite"] = false;
+	this->isDuplicate["root"] = false;
+	this->isDuplicate["alias"] = false;
+	this->isDuplicate["uploadTo"] = false;
 }
 
 Route::Route(const Route &src)
@@ -36,6 +44,40 @@ Route::Route(const Route &src)
 
 Route::~Route()
 {
+}
+
+void
+Route::addDirective(const int lineNumber, const string &directive)
+{
+	string key, value;
+	stringstream ss(directive);
+
+	ss >> key;
+	if (!getline(ss, value)) {
+		Logger::warn("Failed to read route directive. Skipping ...");
+		return;
+	}
+	value = String::strim(value, " \f\r\t\v");
+
+	if (key == "cgi_pass") {
+		handleCgiPass(lineNumber, value);
+	} else if (key == "listing") {
+		handleListing(lineNumber, value);
+	} else if (key == "index") {
+		handleIndex(lineNumber, value);
+	} else if (key == "methods") {
+		handleMethods(lineNumber, value);
+	} else if (key == "rewrite") {
+		handleRewrite(lineNumber, value);
+	} else if (key == "root") {
+		handleRoot(lineNumber, value);
+	} else if (key == "alias") {
+		handleAlias(lineNumber, value);
+	} else if (key == "upload_to") {
+		handleUploadTo(lineNumber, value);
+	} else {
+		Logger::warn("Unknown route directive : " + directive);
+	}
 }
 
 void
@@ -69,7 +111,7 @@ Route::check(Request &request) const
 bool
 Route::match(Request &request) const
 {
-	return (String::match(this->target, request.getTarget()));
+	return (String::match((this->target), request.getTarget()) || String::match((this->target + "/*"), request.getTarget()));
 }
 
 Route&
@@ -84,6 +126,7 @@ Route::operator=(const Route &rhs)
 		this->rooting = rhs.rooting;
 		this->target = rhs.target;
 		this->upload = rhs.upload;
+		this->isDuplicate = rhs.isDuplicate;
 	}
 	return (*this);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Gateway.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: muteza <muteza@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:09 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/02 17:22:59 by muteza           ###   ########.fr       */
+/*   Updated: 2024/07/09 22:55:12 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 #include <filesystem>
 #include <vector>
 #include "Http/Request.hpp"
+#include "Logger/Logger.hpp"
+#include "Environment/Environment.hpp"
 #include <string>
 
 class Gateway
@@ -32,12 +34,12 @@ class Gateway
 		Gateway&	operator=(const Gateway &rhs);
 
 
-		std::string extractPort(const std::string& address);		
+		/*std::string extractPort(const std::string& address);		
 		const char *getAbsolutePathOfFile(const char *fileName);
 		void	 addenv(const std::string& key, const std::string& value);
-		char	**put_to_env();
-		std::string	cgirun(Request& req, const string &passcgi, const string &script);
-	public   :
-		std::vector<std::string> v;
+		char	**put_to_env();*/
+		std::string	run(Request& req, const string &passcgi, const string &script);
+	/*public   :
+		std::vector<std::string> v;*/
 };
 

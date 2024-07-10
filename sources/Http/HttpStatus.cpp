@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 18:05:21 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/21 17:17:26 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/09 20:40:15 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ HttpStatus::HttpStatus()
 	this->_status[410] 		= "Gone";
 	this->_status[411] 		= "Length Required";
 	this->_status[412] 		= "Precondition Failed";
-	this->_status[413] 		= "Payload Too Large";
+	this->_status[413] 		= "Content Too Large";
 	this->_status[414] 		= "URI Too Long";
 	this->_status[415] 		= "Unsupported Media Type";
 	this->_status[416] 		= "Range Not Satisfiable";

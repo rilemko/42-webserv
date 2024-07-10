@@ -1,6 +1,4 @@
 <?php
 
-echo '<pre>';
-var_export($_SERVER);
-echo '</pre>';
-echo phpinfo();
+echo $_POST["key1"];
+echo $_GET["key1"];

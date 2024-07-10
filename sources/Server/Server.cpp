@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 17:11:07 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:40:46 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ Server::run()
 	this->socket = Socket(this->listen);
 	for (size_t i = 0, j = this->routes.size() - 1; i < j; i++)
 	{
-		if (i < j && this->routes[i]->target == "*")
+		if (i < j && this->routes[i]->target == "/*")
 		{
 			this->routes.push_back(this->routes[i]);
 			this->routes.erase(this->routes.begin() + i--);
@@ -113,6 +113,7 @@ Server::operator=(const Server &rhs)
 		this->snames = rhs.snames;
 		this->socket = rhs.socket;
 		this->target = rhs.target;
+		this->isDuplicate = rhs.isDuplicate;
 	}
 	return (*this);
 }

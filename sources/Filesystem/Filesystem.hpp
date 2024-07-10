@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/16 16:42:59 by mconreau          #+#    #+#             */
-/*   Updated: 2024/06/12 22:05:38 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/09 22:23:36 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ using namespace std;
 
 class Filesystem
 {
+	typedef basic_string<unsigned char> ustring;
+	
 	private  :
 		virtual						~Filesystem() = 0;
 
@@ -44,6 +46,8 @@ class Filesystem
 		static bool					isWritable(const string &path);
 		static bool					isXcutable(const string &path);
 		static string				recv(const int &fd);
+		static string				read(const int &fd);
 		static void					send(const int &fd, const string &data);
+		static void					write(const int &fd, const string &data);
 		static vector<string>		scandir(const string &path, const bool &hidden = false);
 };
