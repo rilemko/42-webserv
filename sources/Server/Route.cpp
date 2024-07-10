@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 10:26:16 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 11:32:15 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,17 +115,16 @@ Route::match(Request &request) const
 Route&
 Route::operator=(const Route &rhs)
 {
-	if (this != &rhs) {
-		this->dirlst = rhs.dirlst;
-		this->dindex = rhs.dindex;
-		this->method = rhs.method;
-		this->passcgi = rhs.passcgi;
-		this->rewrite = rhs.rewrite;
-		this->rooting = rhs.rooting;
-		this->target = rhs.target;
-		this->upload = rhs.upload;
-		this->isDuplicate = rhs.isDuplicate;
-	}
+	this->alias = rhs.alias;
+	this->dirlst = rhs.dirlst;
+	this->dindex = rhs.dindex;
+	this->method = rhs.method;
+	this->passcgi = rhs.passcgi;
+	this->rewrite = rhs.rewrite;
+	this->rooting = rhs.rooting;
+	this->target = rhs.target;
+	this->upload = rhs.upload;
+	this->isDuplicate = rhs.isDuplicate;
 	return (*this);
 }
 
