@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/09 21:08:36 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 11:32:51 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,16 +134,14 @@ Server::match(Request &request) const
 Server&
 Server::operator=(const Server &rhs)
 {
-	if (this != &rhs) {
-		this->errors = rhs.errors;
-		this->listen = rhs.listen;
-		this->maxbdy = rhs.maxbdy;
-		this->routes = rhs.routes;
-		this->snames = rhs.snames;
-		this->socket = rhs.socket;
-		this->target = rhs.target;
-		this->isDuplicate = rhs.isDuplicate;
-	}
+	this->errors = rhs.errors;
+	this->listen = rhs.listen;
+	this->maxbdy = rhs.maxbdy;
+	this->routes = rhs.routes;
+	this->snames = rhs.snames;
+	this->socket = rhs.socket;
+	this->target = rhs.target;
+	this->isDuplicate = rhs.isDuplicate;
 	return (*this);
 }
 
