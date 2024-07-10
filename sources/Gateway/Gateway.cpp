@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 11:21:46 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 11:29:50 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,10 +138,11 @@ Gateway::run(Request& req, const string &passcgi, const string &script)
 
 		return response;
     }
+}
 /*
 std::string
 Gateway::cgirun(Request& req, const string &passcgi, const string &script) {
-	/*
+	
 	int pipefd[2];
 	if (pipe(pipefd) == -1) {
 		perror("pipe");
@@ -220,8 +221,7 @@ Gateway::cgirun(Request& req, const string &passcgi, const string &script) {
 		kill(pid, SIGKILL);
 		return response;
 	}
-	*/
-}
+}*/
 
 Gateway& Gateway::operator=(const Gateway &rhs)
 {

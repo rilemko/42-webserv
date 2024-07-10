@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 10:22:13 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 11:29:12 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,10 @@ Manager::run(const int &fd)
 			{
 				if ((rte = srv->routes[i])->match(*req))
 				{
+					res.addHeader("Allow", String::join(rte->method, ", "));
+
 					if ((s = rte->check(*req)) != 200)
-					{
-						if (s == 405) res.addHeader("Allow", String::join(rte->method, ", "));
 						this->error(res, s, srv->errors[s] != "" ? Filesystem::get(srv->errors[s]) : Template::error(s));
-					}
 					else if (rte->rewrite.first != 0)
 						res.setStatus(rte->rewrite.first).addHeader("Location", rte->rewrite.second).send();
 					else
