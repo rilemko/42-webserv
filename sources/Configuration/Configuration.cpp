@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/05 16:24:35 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:24:15 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,23 +14,25 @@
 
 Configuration::Configuration(const string &config, const int &epollfd) : _isNotRoute(false)
 {
-	ifstream		stream(config.c_str());
-	size_t			context = 0, y = 0; // "context": 0 = none, 1 = server, 2 = route; "y": number of the line, can be used for error message if needed
-	string			line;
-	Server*			currentServer = NULL;
-	Route*			currentRoute = NULL;
-	ostringstream	buffer;
+	ifstream				stream(config.c_str());
+	size_t					context = 0, y = 0; // "context": 0 = none, 1 = server, 2 = route; "y": number of the line, can be used for error message if needed
+	string					line;
+	Server*					currentServer = NULL;
+	Route*					currentRoute = NULL;
+	ostringstream			buffer;
+	ServerConfiguration*	serverConfig = NULL;
+	RouteConfiguration*		routeConfig = NULL;
 
 	if (!stream.is_open())
 		this->abort("Failed to open the configuration file: " + config); // Aborting (set "_status" to false and print message to stderr)
 	else
 	{
 		Logger::info("Reading configuration: " + config);
-		while (std::getline(stream, line)) {
+		while (getline(stream, line)) {
 			line = String::strim(line, " \f\r\t\v");
 			y++;
-			string reformattedLine = reformatLine(line, y);
-			buffer << reformattedLine << std::endl;
+			string reformattedLine = _reformatLine(line, y);
+			buffer << reformattedLine << endl;
 		}
 		istringstream stream2(buffer.str());
 		while (this->_status && getline(stream2, line, '\n')) // While "_status" == true and there is a line
@@ -44,6 +46,7 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 				// Open server.
 				Logger::dump("Entering server #" + String::tostr(this->_servers.size() + 1));
 				currentServer = new Server;
+				serverConfig = new ServerConfiguration();
 				++context;
 			}
 			else if (context == 1 && String::match("location ** {", line)) // If context == server and line match the pattern "location ** {"
@@ -56,6 +59,7 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 				if (currentRoute->target == "/") {
 					currentRoute->target = "*";
 				}
+				routeConfig = new RouteConfiguration();
 				++context;
 			}
 			else if (line == "{") {
@@ -79,6 +83,8 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 					Logger::dump("Closing route: " + line);
 					currentServer->routes.push_back(currentRoute);
 					currentRoute = NULL;
+					delete routeConfig;
+					routeConfig = NULL;
 				}
 				--context;
 			}
@@ -88,6 +94,8 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 				Logger::dump("Closing server #" + String::tostr(this->_servers.size() + 1));
 				this->_servers.push_back(currentServer);
 				currentServer = NULL;
+				delete serverConfig;
+				serverConfig = NULL;
 				--context;
 			}
 			else if (context > 2 && line == "}")
@@ -107,13 +115,13 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 				{
 					// Server directive.
 					Logger::dump("Adding server directive: " + line);
-					currentServer->addDirective(y, line);
+					serverConfig->addDirective(*currentServer, y, line);
 				}
 				else if (context == 2 && !_isNotRoute)
 				{
 					// Location directive.
 					Logger::dump("Adding route directive: " + line);
-					currentRoute->addDirective(y, line);
+					routeConfig->addDirective(*currentRoute, y, line);
 				}
 				else if (_isNotRoute) {
 					Logger::warn("Line: " + String::tostr(y) + ". Invalid route definition. Skipping ...");
@@ -258,8 +266,8 @@ Configuration::operator vector<Server*>() const
 }
 
 string
-Configuration::reformatLine(const std::string &line, int sourceLineNumber) {
-	std::stringstream result;
+Configuration::_reformatLine(const string &line, int sourceLineNumber) {
+	stringstream result;
 	size_t len = line.size();
 	bool newLine = true;
 
@@ -291,6 +299,6 @@ Configuration::reformatLine(const std::string &line, int sourceLineNumber) {
 			}
 		}
 	}
-	std::string reformatted = result.str();
+	string reformatted = result.str();
 	return reformatted;
 }

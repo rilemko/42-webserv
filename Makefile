@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+         #
+#    By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/02/02 23:43:39 by mconreau          #+#    #+#              #
-#    Updated: 2024/06/30 13:49:55 by mconreau         ###   ########.fr        #
+#    Updated: 2024/07/08 20:01:13 by rdi-marz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,19 +15,19 @@
 # > GENERAL <<<<<<<<<<<<<<
 
 PROJECT_NAME			:=	webserv
-PROJECT_ARCHIVES		:=	
-PROJECT_DEPENDENCIES	:=	
+PROJECT_ARCHIVES		:=
+PROJECT_DEPENDENCIES	:=
 PROJECT_HEADERS			:=	./includes ./sources
-PROJECT_LIBRARIES		:=	
+PROJECT_LIBRARIES		:=
 
 # > COMPILATION <<<<<<<<<<
 
 COMPILER_PROGRAM		:=	c++
 COMPILER_PROGRAM_DEBUG	:=	-fsanitize=undefined
 COMPILER_PROGRAM_FLAGS	:=	-O3 -o
-COMPILER_PROGRAM_OTHER	:=	
+COMPILER_PROGRAM_OTHER	:=
 COMPILER_OBJECTS		:=	c++
-COMPILER_OBJECTS_FLAGS	:=	-O3 -g -Wall -Werror -Wextra #-std=c++98 -pedantic
+COMPILER_OBJECTS_FLAGS	:=	-O3 -g -Wall -Werror -Wextra -std=c++98 -pedantic
 
 # > EXTENSIONS <<<<<<<<<<<
 
@@ -44,6 +44,8 @@ FOLDER_SOURCES			:=	./sources
 
 PROJECT_SOURCES			:=	$(addprefix $(FOLDER_SOURCES)/, Webserv.cpp			\
 							Configuration/Configuration.cpp						\
+							Configuration/RouteConfiguration.cpp						\
+							Configuration/ServerConfiguration.cpp						\
 							Console/IO.cpp										\
 							Datetime/Datetime.cpp								\
 							Environment/Environment.cpp							\
@@ -283,7 +285,7 @@ debug					:	re
 							fi
 
 
-lclean					:	
+lclean					:
 							@for dependency in $(PROJECT_DEPENDENCIES); do\
 								if [ -d $${dependency} ] && [ -f $${dependency}/Makefile ]; then\
 									$(MAKE) fclean -C $${dependency} --no-print-directory ;\

@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/03 16:06:15 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 16:51:37 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@
 #include <string>
 #include <cstdlib> // for atoi
 
+class ServerConfiguration;
+
 using namespace std;
 
 class Server
@@ -36,7 +38,7 @@ class Server
 		pair<in_addr_t,in_port_t>	target;
 
 	private :
-		map<string, bool>			isDuplicate;
+		ServerConfiguration*		_serverConfig;
 
 	public   :
 									Server();
@@ -44,18 +46,10 @@ class Server
 									~Server();
 
 		void						run();
-		void						addDirective(const int lineNumber, const string &directive);
 		void						PrintServer(void) const;
 
 		size_t						check(Request &request) const;
 		bool						match(Request &request) const;
 
 		Server&						operator=(const Server &rhs);
-
-	private   :
-		bool						contains(const vector<string>& vec, const string& value);
-		void						handleErrorsPage(const int lineNumber, const string &value);
-		void						handleListen(const int lineNumber, const string &value);
-		void						handleMaxBodySize(const int lineNumber, const string &value);
-		void						handleServerName(const int lineNumber, const string &value);
 };

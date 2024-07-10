@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/04 22:49:36 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:23:44 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 #include "Logger/Logger.hpp"
 #include "Server/Server.hpp"
+#include "Configuration/RouteConfiguration.hpp"
+#include "Configuration/ServerConfiguration.hpp"
 #include "Support/Extends/Abortable.hpp"
 #include "Support/Helpers/String.hpp"
 #include <fstream>
@@ -31,7 +33,7 @@ class Configuration : public Abortable
 									Configuration(const Configuration& src);
 									~Configuration();
 	private  :
-		string						reformatLine(const std::string &line, int sourceLineNumber);
+		string						_reformatLine(const string &line, int sourceLineNumber);
 
 	public   :
 		void						printConfig(void) const;
