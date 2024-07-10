@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 18:00:14 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/08 13:19:56 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 10:11:43 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ Application::run()
 
 	for (int e, fd; this->_running && this->_status;)
 	{
-		if ((e = ::epoll_wait(epollfd, events, 16, 2000)) == -1)
+		if ((e = ::epoll_wait(epollfd, events, 16, 15000)) == -1)
 			return (this->abort(Application::_running ? "Failed to wait on epoll" : ""));
 		for (int i = 0; i < e; i++)
 		{

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/08 13:11:40 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/09 20:42:31 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ Request::recv()
 		string			v;
 
 		if (!(t >> this->_method >> this->_target >> v)) return (this->setStatus(400));
+		if (this->_target.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()+,;=") != string::npos) return (this->setStatus(400));
 		if (v != "HTTP/1.1") return (this->setStatus(505));
 		if (this->_target.size() > 2000) return (this->setStatus(414));
 
@@ -82,18 +83,21 @@ Request::recv()
 			this->_target = this->_target.substr(0, d);
 		}
 
+		if (this->_target.size() > 1)
+			this->_target = String::rtrim(this->_target, "/");
+
 		for (size_t e = 0; (e = h.find("\r\n", p)) != string::npos;)
 		{
 			const string	lne = h.substr(p, e - p);
+
+			if (lne.size() > 8000)
+				return (this->setStatus(431));
 
 			if ((d = lne.find(':')) == string::npos)
 				return (this->setStatus(400));
 
 			const string 	key = lne.substr(0, d);
 			const string	val = lne.substr(d + 1);
-
-			if (val.size() > 8000)
-				return (this->setStatus(431));
 			
 			this->_header[String::lowercase(String::strim(key, " "))] = String::strim(val, " ");
 			p = e + 2;
@@ -104,9 +108,9 @@ Request::recv()
 
 		const string	ck = this->getHeader("cookie", "");
 
-		for (size_t s = 0, d = 0; s < ck.size();)
+		for (size_t p = 0, d = 0; p < ck.size();)
 		{
-			const string	lne = ck.substr(s, ck.find(';', s) - s);
+			const string	lne = ck.substr(p, ck.find(';', p) - p);
 
 			if ((d = lne.find('=')) == string::npos)
 				return (this->setStatus(400));
@@ -114,7 +118,8 @@ Request::recv()
 			const string	key = lne.substr(0, d);
 			const string	val = lne.substr(d + 1);
 
-			s += lne.size() + 1;
+			this->_cookie[String::strim(key, " ")] = String::strim(val, " ");
+			p += lne.size() + 1;
 		}
 
 		if (this->_method == "POST" || this->_method == "PUT" || this->_method == "PATCH")
@@ -130,7 +135,7 @@ Request::recv()
 			size_t			cl;
 
 			if (!(stringstream(this->getHeader("content-length", "0")) >> cl))
-				return (this->setStatus(400));
+				return (this->setStatus(500));
 
 			string			bd = this->_packet.substr(p, cl);
 			const size_t	bl = bd.size();
@@ -138,7 +143,8 @@ Request::recv()
 			this->_length = bl;
 			this->_packet = bd;
 
-			if (this->_length < cl) return (this->_remain = cl - bl, this->setStatus(101));
+			if (this->_length < cl)
+				return (this->_remain = cl - bl, this->setStatus(101));
 
 			if (String::lowercase(this->getHeader("content-type", "")).find("multipart/form-data") == 0)
 				return (this->unbound(this->_packet));
@@ -151,8 +157,6 @@ Request::recv()
 void
 Request::unbound(const string &packet)
 {
-	// ==============================================================
-	// TO REWORK:
 	const string	ct = this->getHeader("content-type", "");
 
 	if (!String::match("multipart/form-data; boundary=*", String::lowercase(ct)))
@@ -162,21 +166,18 @@ Request::unbound(const string &packet)
 		const string	bn = "--" + ct.substr(ct.find('=') + 1);
 		const size_t	bs = bn.size();
 
-		for (size_t e = 0, p = bs + 2; p < packet.size() && (e = packet.find(bn, p)) != string::npos;)
+		for (size_t e = 0, p = bs + 2; (e = packet.find(bn, p)) != string::npos;)
 		{
 			const string	bp = packet.substr(p, packet.find(bn, p) - p - 2);
 
+			if (String::match("Content-Disposition: form-data; name=\"?*\"; filename=\"?*\"\r\n*\r\n\r\n*", bp))
+			{
+				const size_t	fs = bp.find("filename=\"") + 10;
+				this->_upload[(bp.substr(fs, bp.find("\"", fs) - fs))] = bp.substr(bp.find("\r\n\r\n") + 4);
+			}
 			p = e + bs + 2;
-
-			if (!String::match("Content-Disposition: form-data; name=\"?*\"; filename=\"?*\"\r\n*\r\n\r\n*", bp))
-				continue ;
-
-			const size_t	fs = bp.find("filename=\"") + 10;
-
-			this->_upload[(bp.substr(fs, bp.find("\"", fs) - fs))] = bp.substr(bp.find("\r\n\r\n") + 4);
 		}
 	}
-	// ==============================================================
 }
 
 void
@@ -198,8 +199,8 @@ Request::unchunk(const string &packet)
 
 				stringstream	ss;
 
-				ss << hex << bd;
-				ss >> cl;
+				if (!(ss << hex << bd) || !(ss >> cl))
+					return (this->setStatus(500));
 
 				if (cl == 0)
 				{

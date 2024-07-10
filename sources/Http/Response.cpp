@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:26 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 23:00:13 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 10:16:44 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 Response::Response(const int &socket) :
 	_header("HTTP/1.1 %1 %2\r\nServer: Webserv/1.0.0\r\n"),
+	_mimetp("text/html"),
 	_packet("\r\n"),
 	_socket(socket),
 	_status(200)
@@ -38,9 +39,8 @@ Response::send()
 	this->_header = String::replace(this->_header, "%2", HttpStatus.get(this->_status));
 
 	this->addHeader("Content-Length", String::tostr(this->_packet.size() - 2));
-	this->addHeader("Content-Type", "text/html");
+	this->addHeader("Content-Type", this->_mimetp);
 	this->addHeader("Date", Datetime(Datetime::RFC7231));
-	this->addCookie("sessid", this->_sessid);
 
 	Filesystem::send(this->_socket, this->_header + this->_packet);
 }
@@ -48,7 +48,16 @@ Response::send()
 void
 Response::send(const string &packet)
 {
-	Filesystem::send(this->_socket, packet);
+	static HttpStatus	HttpStatus;
+	
+	this->_header = String::replace(this->_header, "%1", String::tostr(this->_status));
+	this->_header = String::replace(this->_header, "%2", HttpStatus.get(this->_status));
+
+	this->addHeader("Content-Length", String::tostr(packet.substr(packet.find("\r\n\r\n") + 4).size()));
+	this->addHeader("Content-Type", this->_mimetp);
+	this->addHeader("Date", Datetime(Datetime::RFC7231));
+
+	Filesystem::send(this->_socket, this->_header + packet);
 }
 
 Response&
@@ -75,9 +84,16 @@ Response::addPacket(const string &packet)
 }
 
 Response&
+Response::setMimeType(const string &type)
+{
+	this->_mimetp = type;
+	return (*this);
+}
+
+Response&
 Response::setSessid(const string &sessid)
 {
-	this->_sessid = sessid;
+	this->addCookie("sessid", sessid);
 	return (*this);
 }
 

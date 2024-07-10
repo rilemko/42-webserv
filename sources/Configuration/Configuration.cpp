@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 19:47:47 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 10:02:49 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,12 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 				currentRoute  = new Route;
 				size_t	pos = line.find(' ');
 				currentRoute->target = line.substr(pos + 1, line.find(' ', pos + 1) - pos - 1);
-				if (currentRoute->target == "/") {
+				if (currentRoute->target.size() > 1)
+					currentRoute->target = String::rtrim(currentRoute->target, "/"); // NEW: TRIM RIGHT SLASHES
+				if (currentRoute->target == "/")
 					currentRoute->target = "*";
-				}
+				if (currentRoute->target[0] != '/')
+					currentRoute->target = '/' + currentRoute->target; // NEW : ENSURE LEADING SLASH
 				++context;
 			}
 			else if (line == "{") {

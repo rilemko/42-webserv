@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/18 13:02:11 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 18:19:21 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/09 22:23:52 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,17 @@ Filesystem::recv(const int &fd)
 	return (data);
 }
 
+string
+Filesystem::read(const int &fd)
+{
+	string	data;
+	char	buffer[2048];
+
+	for (int b = 0; (b = ::read(fd, buffer, 2048)) > 0;)
+		data.append(buffer, b);
+	return (data);
+}
+
 void
 Filesystem::send(const int &fd, const string &data)
 {
@@ -118,6 +129,19 @@ Filesystem::send(const int &fd, const string &data)
 	while (t < l)
 	{
 		r -= (b = ::send(fd, &data[t], r, MSG_DONTWAIT));
+		t += b;
+	}
+}
+
+void
+Filesystem::write(const int &fd, const string &data)
+{
+	const int	l = data.size();
+	int 		b = 0, r = l, t = 0;
+
+	while (t < l)
+	{
+		r -= (b = ::write(fd, &data[t], r));
 		t += b;
 	}
 }

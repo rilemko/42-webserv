@@ -1,8 +1,4 @@
 [ ] TODO : Setup correct Mime Type for response
-[ ] TODO : Add Allow header for invalid method error response
-[ ] TODO : Improve and optimize Request::unbound()
-[ ] TODO : Rework Manager::run() logic
-[ ] TODO : Pass set to String::rand as parameter
 
 [X] TODO : Create the vector<Server*> by parsing instead of hard-add it in the "Configuration" class
 		- (i) Each "Server" class contains a vector<Route>
@@ -41,3 +37,7 @@
 		- The CGI program should normally write the whole response, with status code and headers included...
 [X] TODO : Handle session
 [X] TODO : Rework Request cookie parsing logic
+[X] TODO : Improve and optimize Request::unbound()
+[X] TODO : Pass set to String::rand as parameter
+[X] TODO : Add Allow header for invalid method error response
+[X] TODO : Rework Manager::run() logic

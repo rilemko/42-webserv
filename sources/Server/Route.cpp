@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 22:21:10 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 10:26:16 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 Route::Route() :
 	dirlst(true),
 	dindex("/index.html"),
-	rooting("www")
+	rooting("")
 {
 	this->method.push_back("GET");
 	this->method.push_back("POST");
@@ -32,6 +32,7 @@ Route::Route() :
 	this->isDuplicate["methods"] = false;
 	this->isDuplicate["rewrite"] = false;
 	this->isDuplicate["root"] = false;
+	this->isDuplicate["alias"] = false;
 	this->isDuplicate["uploadTo"] = false;
 }
 
@@ -69,10 +70,12 @@ Route::addDirective(const int lineNumber, const string &directive)
 		handleRewrite(lineNumber, value);
 	} else if (key == "root") {
 		handleRoot(lineNumber, value);
+	} else if (key == "alias") {
+		handleAlias(lineNumber, value);
 	} else if (key == "upload_to") {
 		handleUploadTo(lineNumber, value);
 	} else {
-		Logger::warn("Unknown route directive ; " + directive);
+		Logger::warn("Unknown route directive : " + directive);
 	}
 }
 
@@ -106,7 +109,7 @@ Route::check(Request &request) const
 bool
 Route::match(Request &request) const
 {
-	return (String::match(this->target, request.getTarget()));
+	return (String::match((this->target), request.getTarget()) || String::match((this->target + "/*"), request.getTarget()));
 }
 
 Route&
@@ -177,6 +180,8 @@ Route::handleIndex(const int lineNumber, const string &value)
 void
 Route::handleMethods(const int lineNumber, const string &value)
 {
+	if (value == "*")
+		return ;
 	if (isDuplicate["methods"]) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". Methods directive already set. Adding new value(s) ...");
 	} else {
@@ -216,6 +221,17 @@ Route::handleRewrite(const int lineNumber, const string &value)
 }
 
 void
+Route::handleAlias(const int lineNumber, const string &value)
+{
+	if (isDuplicate["alias"]) {
+		Logger::warn("Line: " + String::tostr(lineNumber) + ". Root directive already set. Replacing old value...");
+	} else {
+		isDuplicate["alias"] = true;
+	}
+	this->alias = (this->rooting.size() && value[0] != '/' ? "/" : "") + value; // NEW: ADD LEADING SLASH IF ROOT
+}
+
+void
 Route::handleRoot(const int lineNumber, const string &value)
 {
 	if (isDuplicate["root"]) {
@@ -223,7 +239,7 @@ Route::handleRoot(const int lineNumber, const string &value)
 	} else {
 		isDuplicate["root"] = true;
 	}
-	this->rooting = value;
+	this->rooting = value + (this->alias.size() && value[value.size() - 1] != '/' ? "/" : ""); // NEW: ADD TRAILING SLASH IF NO ALIAS
 }
 
 void

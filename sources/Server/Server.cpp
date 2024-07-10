@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
+/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/03 16:08:23 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/09 21:08:36 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ Server::run()
 	this->socket = Socket(this->listen);
 	for (size_t i = 0, j = this->routes.size() - 1; i < j; i++)
 	{
-		if (i < j && this->routes[i]->target == "*")
+		if (i < j && this->routes[i]->target == "/*")
 		{
 			this->routes.push_back(this->routes[i]);
 			this->routes.erase(this->routes.begin() + i--);
@@ -245,13 +245,7 @@ Server::handleMaxBodySize(const int lineNumber, const string &value)
 	if (!ss.eof()) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". Too many arguments, first value used to set maxbdy.");
 	}
-	if (maxbdyValue == 0) {
-		Logger::warn("Line: " + String::tostr(lineNumber) + ". maxbdy value can't be zero. Skipping ...");
-	}
-	else
-	{
-		this->maxbdy =  maxbdyValue;
-	}
+	this->maxbdy =  maxbdyValue;
 }
 
 bool

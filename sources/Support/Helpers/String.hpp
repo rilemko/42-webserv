@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/26 22:30:54 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 22:59:10 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/09 12:46:05 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class String
 		static string				join(const vector<string> &array, const string &delimiter);
 		static string				lowercase(string subject);
 		static string				uppercase(string subject);
-		static string				rand(const size_t &size);
+		static string				rand(const size_t &size, const string &set);
 		
 		template<typename TYPE>
 		static string				tostr(const TYPE &content);

@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/06 20:09:05 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/07 22:49:02 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 10:16:41 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ class Response
 {
 	private  :
 		string						_header;
+		string						_mimetp;
 		string						_packet;
 		string						_sessid;
 		int							_socket;
@@ -38,6 +39,7 @@ class Response
 		Response&					addCookie(const string &key, const string &value, const time_t &age = 0);
 		Response&					addHeader(const string &key, const string &value);
 		Response&					addPacket(const string &packet);
+		Response&					setMimeType(const string &type);
 		Response&					setSessid(const string &sessid);
 		Response&					setStatus(const size_t &status);
 
