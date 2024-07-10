@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Route.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 11:32:15 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 21:46:51 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,8 +179,10 @@ Route::handleIndex(const int lineNumber, const string &value)
 void
 Route::handleMethods(const int lineNumber, const string &value)
 {
-	if (value == "*")
+	if (value == "*") {
+		isDuplicate["methods"] = true;
 		return ;
+	}
 	if (isDuplicate["methods"]) {
 		Logger::warn("Line: " + String::tostr(lineNumber) + ". Methods directive already set. Adding new value(s) ...");
 	} else {
