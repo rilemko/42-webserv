@@ -6,7 +6,7 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/09 22:55:56 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 10:55:56 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ Gateway::run(Request& req, const string &passcgi, const string &script)
 		env.add("HTTP_USER_AGENT", req.getHeader("user-agent", ""));
 		env.add("HTTP_ACCEPT_ENCODING", req.getHeader("accept-encoding", ""));
 		env.add("HTTP_ACCEPT_LANGUAGE", req.getHeader("accept-language", "en-us"));
-		env.add("HTTP_CONNECTION", req.getHeader("connection", ""));
+		env.add("HTTP_CONNECTION", req.getHeader("connection", "keep-alive"));
 		env.add("HTTP_COOKIE", req.getHeader("cookie", ""));
 		env.add("REQUEST_URI", req.getTarget() + (req.getParams().size() ? "?" + req.getParams() : ""));
 		env.add("SCRIPT_FILENAME", script);
