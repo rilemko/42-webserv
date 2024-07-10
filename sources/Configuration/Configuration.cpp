@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 20:16:33 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 17:45:11 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:52:28 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ Configuration::Configuration(const string &config, const int &epollfd) : _isNotR
 					currentRoute->target = "*";
 				if (currentRoute->target[0] != '/')
 					currentRoute->target = '/' + currentRoute->target; // NEW : ENSURE LEADING SLASH
+				routeConfig = new RouteConfiguration();
 				++context;
 			}
 			else if (line == "{") {

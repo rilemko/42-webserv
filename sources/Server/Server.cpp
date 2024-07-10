@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 17:40:46 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/10 17:53:44 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,6 @@ Server::operator=(const Server &rhs)
 		this->snames = rhs.snames;
 		this->socket = rhs.socket;
 		this->target = rhs.target;
-		this->isDuplicate = rhs.isDuplicate;
 	}
 	return (*this);
 }
