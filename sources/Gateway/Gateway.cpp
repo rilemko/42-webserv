@@ -6,13 +6,15 @@
 /*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/07 18:27:13 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 10:55:56 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 10:56:57 by mconreau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Gateway/Gateway.hpp"
 
-Gateway::Gateway() {}
+Gateway::Gateway()
+{
+}
 
 Gateway::Gateway(const Gateway &src)
 {
