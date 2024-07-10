@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Webserv.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mconreau <mconreau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 17:56:03 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/08 22:10:46 by mconreau         ###   ########.fr       */
+/*   Updated: 2024/07/10 18:24:25 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int
 main(const int agc, const char **agv, const char **env)
 {
 	Logger::logs("Launching Webserv...");
-	return(!Application(agc > 1 ? agv[1] : "", Environment(env).get("PWD", "")).run());
+	return(!Application(agc > 1 ? agv[1] : "", Environment(env).get("PATH", "")).run());
 }
 
 /*
