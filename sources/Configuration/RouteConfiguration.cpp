@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:19 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 17:23:24 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/11 14:17:07 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,21 @@ RouteConfiguration::_handleMethods(Route &route, const int lineNumber, const str
 	string method;
 	while (ss >> method)
 	{
-		route.method.push_back(method);
+		if (method == "*") {
+			route.method.clear();
+			route.method.push_back("GET");
+			route.method.push_back("POST");
+			route.method.push_back("HEAD");
+			route.method.push_back("PUT");
+			route.method.push_back("DELETE");
+			route.method.push_back("CONNECT");
+			route.method.push_back("OPTIONS");
+			route.method.push_back("TRACE");
+			route.method.push_back("PATCH");
+			return;
+		} else {
+			route.method.push_back(method);
+		}
 	}
 }
 
