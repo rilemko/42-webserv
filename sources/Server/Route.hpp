@@ -6,7 +6,7 @@
 /*   By: rdi-marz <rdi-marz@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/04 21:47:17 by mconreau          #+#    #+#             */
-/*   Updated: 2024/07/10 17:41:36 by rdi-marz         ###   ########.fr       */
+/*   Updated: 2024/07/11 15:34:04 by rdi-marz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,6 @@ class Route
 		string						rooting;
 		string						target;
 		string						upload;
-
-	private:
-		RouteConfiguration*			_routeConfig;
 
 	public   :
 									Route();
